@@ -4,14 +4,6 @@
 #With thanks to http://www.network-science.de/ascii/ for the ascii artification of words
 
 
-#The following is a brief description of what is done in each round
-#Round 1: 6 stack values, esp always at the bottom, ebp always at the top
-#Round 2: 6 stack values, esp & ebp random locations, but same stack orientation
-#Round 3: Same as previous, but now whether the low addresses are on top or bottom of diagram is randomized
-#Round 4: 8 stack values, added horizontal diagrams, so now low addresses can be top, bottom, left, or right
-#Round 5: Make it so that randomly you will only have the choice to offset from one of esp or ebp
-#Round 6: Add in the notion of parameters passed in on the stack as well as function return address and saved ebp
-
 use Switch;
 use Time::Local;
 
@@ -109,7 +101,7 @@ print "ROUND 3: 5000 points needed to pass\n";
 print "Hit any key to continue\n";
 chomp($userInput = <STDIN>);
 
-#while($currentScore < 5000){
+while($currentScore < 5000){
 	$numStackElements = 6;
 	$indexToFind = int(rand($numStackElements));
 #	print "indexToFind = $indexToFind\n";
@@ -123,7 +115,7 @@ chomp($userInput = <STDIN>);
 	$timeBonus = timelocal(localtime()) - $timeBonus;
 #	print "timeBonus = $timeBonus\n";
 	ScoreKeeper($correctness, 200, $timeBonus);
-#}
+}
 
 print '  ___    __    _  _    _  _  _____  __  __ ';print "\n";
 print ' / __)  /__\  ( \( )  ( \/ )(  _  )(  )(  )';print "\n";
@@ -135,37 +127,6 @@ print '(  _ \(_  _)/ __)  (_  _)(_  _)(__ ))(';print "\n";
 print ' )(_) )_)(_( (_-.   _)(_   )(   (_/ \/';print "\n";
 print '(____/(____)\___/  (____) (__)  (_) ()';print "\n";
 
-print "~~~~~~~~~~~~~~~~~~~~~~LEVEL 3 COMPLETED~~~~~~~~~~~~~~~~~~~~~~\n";
-print "Remember \"Smashing the Stack for Fun and Profit\"? Of course\n";
-print "you do. Wait, what? You don't. Oh, well then you should go\n";
-print "read it AFTER you're done with this game ;). Funny thing is\n";
-print "in that paper aleph1 represented the stack as growing both\n";
-print "upward, but also to the left! (With the memory writes to\n";
-print "overflow the buffer going toward the left, in typical English\n";
-print "fashion. Anyway, now we're going to mix it up so that the\n";
-print "stack can grow up, down, left, or right! :D\n";
-print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-print "ROUND 4: 9000 points needed to pass\n";
-print "Hit any key to continue\n";
-chomp($userInput = <STDIN>);
-
-while($currentScore < 9000){
-	$numStackElements = 8;
-	$indexToFind = int(rand($numStackElements));
-	print "indexToFind = $indexToFind\n";
-	$ebpIndex = $numStackElements/2 + int(rand($numStackElements/2)); #want this to stay on the bottom half of the stack for now
-	print "ebpIndex = $ebpIndex\n";
-	$espIndex = int(rand($numStackElements/2)); #want this to stay on the top half of the stack for now
-	print "espIndex = $espIndex\n";
-	$timeBonus = timelocal(localtime());
-	$orientation = int(rand(4));
-	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
-	$timeBonus = timelocal(localtime()) - $timeBonus;
-	print "timeBonus = $timeBonus\n";
-	ScoreKeeper($correctness, 400, $timeBonus);
-}
-
-print "ASCII ART HERE!\n";
 
 #$orientation values: 0 = low addresses at bottom, 1 = low addresses at top, 2 = low addresses at left, 3 = low addresses at right
 #$numStackElements, 1-based number of elements in the stack, so if == 1, then there will be 1 element which both ebp and esp point at
@@ -245,7 +206,7 @@ nextWhile:
 	#convert the ebp and esp relative values into eventual number-letter combinations like the user will have to input
 	@correctInput[0] = "a$ebpOffsetDisplayIndex";
 	@correctInput[1] = "b$espOffsetDisplayIndex";
-	print "correctInput = @correctInput\n";
+#	print "correctInput = @correctInput\n";
 
 	#now generate the random values to display on the stack
 	@randStackStuff = ();
@@ -342,83 +303,10 @@ sub PrintStackWithOrientation{
 		#low addresses at left
 		case 2{
 			print "case 2\n";
-			print "LOW ADDRESSES ";
-			for($i = 0; $i < @array; $i++){
-				print "|------------";
-			}
-			print "| HIGH ADDRESSES\n";
-
-			print "LOW ADDRESSES ";
-			for($i = 0; $i < @array; $i++){
-				print "| 0x";
-				if(length($array[$i]) > 8){
-					print "length($array[$i])\n";
-					return;
-				}
-				$padding = 8 - length($array[$i]);
-				while($padding){
-					print "0";
-					$padding--;
-				}
-				print "$array[$i] ";
-
-			}
-			print "| HIGH ADDRESSES\n";
-
-			print "LOW ADDRESSES ";
-			for($i = 0; $i < @array; $i++){
-				if($i == $ebpIndex || $i == $espIndex) {print "|^^^^^^^^^^^^";}
-				else{print "|------------";}
-			}
-			print "| HIGH ADDRESSES\n";
-
-			print "LOW ADDRESSES ";
-			for($i = 0; $i < @array; $i++){
-				if($i == $ebpIndex) {print "|     EBP    ";}
-				elsif($i == $espIndex) {print "|     ESP    ";}
-				else {print "|            ";}
-			}
-			print "| HIGH ADDRESSES\n";
 		}
 		#low addresses at right
 		case 3{
-			print "HIGH ADDRESSES ";
-			for($i = @array-1; $i >= 0; $i--){
-				print "|------------";
-			}
-			print "| LOW ADDRESSES\n";
-
-			print "HIGH ADDRESSES ";
-			for($i = @array-1; $i >= 0; $i--){
-				print "| 0x";
-				if(length($array[$i]) > 8){
-					print "length($array[$i])\n";
-					return;
-				}
-				$padding = 8 - length($array[$i]);
-				while($padding){
-					print "0";
-					$padding--;
-				}
-				print "$array[$i] ";
-
-			}
-			print "| LOW ADDRESSES\n";
-
-			print "HIGH ADDRESSES ";
-			for($i = @array-1; $i >= 0; $i--){
-				if($i == $ebpIndex || $i == $espIndex) {print "|^^^^^^^^^^^^";}
-				else{print "|------------";}
-			}
-			print "| LOW ADDRESSES\n";
-
-			print "HIGH ADDRESSES ";
-			for($i = @array-1; $i >= 0; $i--){
-				if($i == $ebpIndex) {print "|     EBP    ";}
-				elsif($i == $espIndex) {print "|     ESP    ";}
-				else {print "|            ";}
-			}
-			print "| LOW ADDRESSES\n";
+			print "case 3\n";
 		}
 		else{
 			print "you suck\n";

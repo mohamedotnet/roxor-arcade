@@ -49,6 +49,9 @@ print '|  _  || |/\| || |/\| || |/\| |   \ /  |  __||  _  ||  _  || || || |'; pr
 print '| | | |\  /\  /\  /\  /\  /\  /   | |  | |___| | | || | | ||_||_||_|'; print "\n";
 print '\_| |_/ \/  \/  \/  \/  \/  \/    \_/  \____/\_| |_/\_| |_/(_)(_)(_)'; print "\n";
 
+#For the OS X users ;)
+system("say \"Awwww yeah!\"");
+
 print "~~~~~~~~~~~~~~~~~~~~~~LEVEL 1 COMPLETED~~~~~~~~~~~~~~~~~~~~~~\n";
 print "In this round, ebp and esp will not always be at the top and \n";
 print "bottom of the stack fragment you are shown. You will also \n";
@@ -82,6 +85,8 @@ print '  / /_/ // / / // /    / ,<     / / / //  |/ // // // / '; print "\n";
 print ' / _, _// /_/ // /___ / /| |   / /_/ // /|  //_//_//_/  '; print "\n";
 print '/_/ |_| \____/ \____//_/ |_|   \____//_/ |_/(_)(_)(_)   '; print "\n";
 
+#For the OS X users ;)
+system("say \"Rock on!\"");
 
 #$orientation values: 0 = low addresses at bottom, 1 = low addresses at top, 2 = low addresses at left, 3 = low addresses at right
 #$numStackElements, 1-based number of elements in the stack, so if == 1, then there will be 1 element which both ebp and esp point at
@@ -188,7 +193,7 @@ nextWhile:
 	print "> ";
 
 	chomp($userInput = <STDIN>);
-	if($userInput == $correctInput[0] || $userInput == $correctInput[1]){
+	if($userInput eq $correctInput[0] || $userInput eq $correctInput[1]){
 		return 1;
 	}
 	else{

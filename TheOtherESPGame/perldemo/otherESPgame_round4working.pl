@@ -4,14 +4,6 @@
 #With thanks to http://www.network-science.de/ascii/ for the ascii artification of words
 
 
-#The following is a brief description of what is done in each round
-#Round 1: 6 stack values, esp always at the bottom, ebp always at the top
-#Round 2: 6 stack values, esp & ebp random locations, but same stack orientation
-#Round 3: Same as previous, but now whether the low addresses are on top or bottom of diagram is randomized
-#Round 4: 8 stack values, added horizontal diagrams, so now low addresses can be top, bottom, left, or right
-#Round 5: Make it so that randomly you will only have the choice to offset from one of esp or ebp
-#Round 6: Add in the notion of parameters passed in on the stack as well as function return address and saved ebp
-
 use Switch;
 use Time::Local;
 
@@ -73,16 +65,16 @@ chomp($userInput = <STDIN>);
 #while($currentScore < 3000){
 	$numStackElements = 6;
 	$indexToFind = int(rand($numStackElements));
-	print "indexToFind = $indexToFind\n";
+#	print "indexToFind = $indexToFind\n";
 	$ebpIndex = $numStackElements/2 + int(rand($numStackElements/2)); #want this to stay on the bottom half of the stack for now
-	print "ebpIndex = $ebpIndex\n";
+#	print "ebpIndex = $ebpIndex\n";
 	$espIndex = int(rand($numStackElements/2)); #want this to stay on the top half of the stack for now
-	print "espIndex = $espIndex\n";
+#	print "espIndex = $espIndex\n";
 	$timeBonus = timelocal(localtime());
 	$orientation = 0;
 	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
 	$timeBonus = timelocal(localtime()) - $timeBonus;
-	print "timeBonus = $timeBonus\n";
+#	print "timeBonus = $timeBonus\n";
 	ScoreKeeper($correctness, 200, $timeBonus);
 #}
 
@@ -152,15 +144,15 @@ chomp($userInput = <STDIN>);
 while($currentScore < 9000){
 	$numStackElements = 8;
 	$indexToFind = int(rand($numStackElements));
-	print "indexToFind = $indexToFind\n";
+#	print "indexToFind = $indexToFind\n";
 	$ebpIndex = $numStackElements/2 + int(rand($numStackElements/2)); #want this to stay on the bottom half of the stack for now
-	print "ebpIndex = $ebpIndex\n";
+#	print "ebpIndex = $ebpIndex\n";
 	$espIndex = int(rand($numStackElements/2)); #want this to stay on the top half of the stack for now
-	print "espIndex = $espIndex\n";
+#	print "espIndex = $espIndex\n";
 	$timeBonus = timelocal(localtime());
 	$orientation = int(rand(4));
 	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
-	$timeBonus = timelocal(localtime()) - $timeBonus;
+#	$timeBonus = timelocal(localtime()) - $timeBonus;
 	print "timeBonus = $timeBonus\n";
 	ScoreKeeper($correctness, 400, $timeBonus);
 }
@@ -245,7 +237,7 @@ nextWhile:
 	#convert the ebp and esp relative values into eventual number-letter combinations like the user will have to input
 	@correctInput[0] = "a$ebpOffsetDisplayIndex";
 	@correctInput[1] = "b$espOffsetDisplayIndex";
-	print "correctInput = @correctInput\n";
+#	print "correctInput = @correctInput\n";
 
 	#now generate the random values to display on the stack
 	@randStackStuff = ();

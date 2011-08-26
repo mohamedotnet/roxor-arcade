@@ -135,7 +135,7 @@ sub StackPrint{
 	print "> ";
 
 	chomp($userInput = <STDIN>);
-	if($userInput == $correctInput[0] || $userInput == $correctInput[1]){
+	if($userInput eq $correctInput[0] || $userInput eq $correctInput[1]){
 		return 1;
 	}
 	else{
