@@ -192,7 +192,7 @@ while($currentScore < 18000){
 	$orientation = int(rand(4));
 	$oneOffsetOnly = int(rand(3));
 	print "random oneOffsetOnly = $oneOffsetOnly\n";
-	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, $oneOffsetOnly, 8);
+	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, $oneOffsetOnly, 6);
 	$timeBonus = timelocal(localtime()) - $timeBonus;
 	ScoreKeeper($correctness, 800, $timeBonus);
 }
