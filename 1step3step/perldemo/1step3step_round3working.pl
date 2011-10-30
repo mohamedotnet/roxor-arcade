@@ -101,7 +101,8 @@ my %round3FalseHash = ( join('-',@round3Condition1) => \@round3FalseAsm1, join('
 
 srand();
 
-my $currentScore = 0;
+$SIG{INT} = \&forceExit;
+$currentScore = 0;
 
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 print "Welcome to the perl demo of 1 step forward, 3 steps back!\n";
@@ -159,8 +160,13 @@ while($currentScore < 1000){
 		print "@key\n";
 	}
 
+	print "Enter q to quit.\n";
 	print "If the condition will be taken, enter 1, otherwise enter 0: ";
 	chomp($userInput = <STDIN>);
+	if($userInput eq 'q'){
+		$currentScore = $currentScore / 100;
+		exit($currentScore);
+	}
 	if($userInput == $conditionTruth){
 		print "Correct! :D \n";
 		$currentScore += 100;
@@ -231,8 +237,12 @@ while($currentScore < 2000){
 		print "$mnemonic\n";	
 	}
 
+	print "Enter q to quit.\n";
 	print "If the condition will be taken, enter 1, otherwise enter 0: ";
 	chomp($userInput = <STDIN>);
+	if($userInput eq 'q'){
+		exit($currentScore);
+	}
 	if($userInput == $conditionTruth){
 		print "Correct! :D \n";
 		$currentScore += 200;
@@ -312,8 +322,12 @@ while($currentScore < 4000){
 		print "$mnemonic\n";	
 	}
 
+	print "Enter q to quit.\n";
 	print "If the condition will be taken, enter 1, otherwise enter 0: ";
 	chomp($userInput = <STDIN>);
+	if($userInput eq 'q'){
+		exit($currentScore);
+	}
 	if($userInput == $conditionTruth){
 		print "Correct! :D \n";
 		$currentScore += 400;
@@ -326,7 +340,7 @@ while($currentScore < 4000){
 	}
 }
 print "-------------LEVEL 3 COMPLETED---------------\n";
-print "WINNER WINNER CHICKEN DINNER!\n"
+print "WINNER WINNER CHICKEN DINNER!\n";
 print "That's all for now. Check out the code and think about how\n";
 print "to turn this into a real game!\n";
 
@@ -376,4 +390,10 @@ sub asmInterpolate{
 
 	return $asmString;
 
+}
+
+sub forceExit{
+	$currentScore = $currentScore / 100;
+	print("caugt SIG{INT}, returning currentScore = $currentScore\n");
+	exit($currentScore);
 }
