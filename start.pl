@@ -63,7 +63,6 @@ while(1){
 	}
 	case 1 {
 		$returnScore = system("perl TheOtherESPGame/perldemo/otherESPgame_full.pl");
-		$returnScore = $returnScore >> 8;
 		$returnScore = ($returnScore >> 8);
 		if($returnScore & 128){
 			$returnScore = 256 - $returnScore;
