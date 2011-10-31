@@ -37,9 +37,10 @@ print("###     ### ###    ###  ########  ###     ### #########  ########## \n");
 while(1){
 	print("Current Score = $currentScore\n\n");
 	print("What would you like to play?\n");
-	print("0) One step forward, 3 steps back\n");
-	print("1) The *other* ESP game\n");
-	print("2) Global Thermonuclear War\n");
+	print("0) BinDeciHex\n");
+	print("1) One step forward, 3 steps back\n");
+	print("2) The *other* ESP game\n");
+	print("3) Global Thermonuclear War\n");
 	print("q) Quit\n");
 
 	print("enter choice> ");
@@ -49,6 +50,19 @@ while(1){
 	case 0 {
 		#thanks to the return value limitations, I can't handle a return value > +127, -128
 		#and I'm too lazy to find another way
+		$returnScore = system("perl BinDeciHex/perldemo/BinDeciHex.pl");
+		$returnScore = ($returnScore >> 8);
+		if($returnScore & 128){
+			$returnScore = 256 - $returnScore;
+			$returnScore *= -100;
+		}
+		else{
+			$returnScore *= 100;
+		}
+		#print("returnScore = $returnScore\n");
+		$currentScore += $returnScore;
+	}
+	case 0 {
 		$returnScore = system("perl 1step3step/perldemo/1step3step_round3working.pl");
 		$returnScore = ($returnScore >> 8);
 		if($returnScore & 128){
