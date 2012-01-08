@@ -1,24 +1,34 @@
 #!/usr/bin/perl
 
+#Round 1: Conditionals: jz(ZF==1), jnz(ZF==0), ja(CF==0 AND ZF==0), jb(CF==1)
+#Round 2: Add new mnemonics for same conditionals: jz/je(ZF==1), jnz/jne(ZF==0), ja/jnbe(CF==0 AND ZF==0), jb/jnae(CF==1)
+#Round 3: New instructions for previous round conditionals + new conditionals: jb/jnae/jc(CF==1), jae/jnc(CF==0), jbe/jna(CF==1 OR ZF==1)
+#Round 4: New instructions + new conditionals: jg/jnle(ZF==0 AND SF==OF), jge/jnl(SF==OF), jl/jnge(SF!=OF), jle/jng(ZF==1 OR SF!=OF)
+#Round 5: New instructions + new conditionals: jo(OF==1), jno(OF!=1), jp/jpe(PF==1), jnp/jpo(PF!=1)
+#Round 6: New instructions + new conditionals: js(SF==1), jns(SF!=1), jecxz(register ecx == 0)
+
 #***************************
 #********ROUND 1************
 #***************************
 
-@round1Condition1 = ("jz (ZF==1)");
-@round1TrueAsm1 = ("xor %rx,%rx");
-@round1FalseAsm1 = ("xor %lti32,%i32", "add %nzi32,%nzi32");
+@round1Condition1 = 	("jz (ZF==1)");
+@round1TrueAsm1 = (	"xor %rx,%rx");
+@round1FalseAsm1 = (	"mov %rx,%lti32\nxor %rx,%i32", 
+			"mov %rx,%nzi32\nadd %rx,%nzi32");
 
-@round1Condition2 = ("jnz (ZF==0)");
-@round1TrueAsm2 = ("xor %lti32,%i32", "add %nzi32,%nzi32");
-@round1FalseAsm2 = ("xor %rx,%rx");
+@round1Condition2 = 	("jnz (ZF==0)");
+@round1TrueAsm2 = 	@round1FalseAsm1;
+@round1FalseAsm2 = 	@round1TrueAsm1;
 
-@round1Condition3 = ("ja (CF==0 AND ZF==0)");
-@round1TrueAsm3 = ("cmp %nzi32,%ltnzi32", "sub %nzi32,%ltnzi32");
-@round1FalseAsm3 = ("cmp %ltnzi32,%nzi32", "sub %ltnzi32,%nzi32");
+@round1Condition3 = (	"ja (CF==0 AND ZF==0)");
+@round1TrueAsm3 = (	"mov %rx,%nzi32\ncmp %rx,%ltnzi32", 
+			"mov %rx,%nzi32\nsub %rx,%ltnzi32");
+@round1FalseAsm3 = (	"mov %rx,%ltnzi32\ncmp %rx,%nzi32", 
+			"mov %rx,%ltnzi32\nsub%rx,%nzi32");
 
-@round1Condition4 = ("jb (CF==1)");
-@round1TrueAsm4 = ("cmp %ltnzi32,%nzi32", "sub %ltnzi32,%nzi32");
-@round1FalseAsm4 = ("cmp %nzi32,%ltnzi32", "sub %nzi32,%ltnzi32");
+@round1Condition4 = 	("jb (CF==1)");
+@round1TrueAsm4 =	@round1FalseAsm3;
+@round1FalseAsm4 =	@round1TrueAsm3;
 
 
 %round1TrueHash = ( @round1Condition1 => \@round1TrueAsm1, @round1Condition2 => \@round1TrueAsm2, @round1Condition3 => \@round1TrueAsm3, @round1Condition4 => \@round1TrueAsm4);
@@ -28,31 +38,34 @@
 #********ROUND 2************
 #***************************
 
-my @round2Condition1 = ("jz (ZF==1)","je (ZF==1)");
-my @round2TrueAsm1 = (@round1TrueAsm1, 
-			"sub %rx,%rx", "mov %rx,%nzi32\nsub %rx,%nzi32", "mov %rx,0\nsub %rx,0",
-			"mov %rx,%nzi32\nsub %nzi32,%rx", "mov %rx,%nzi32\nxor %nzi32,%rx");
-my @round2FalseAsm1 = (@round1FalseAsm1, 
-			"cmp %nzi32,%ltnzi32", "mov %rx,%ltnzi32\ncmp %nzi32,%rx", "mov %rx,%ltnzi32\ncmp %rx,%nzi32",
-			"mov %rx,%nzi32\nxor %rx,%ltnzi32", "mov %rx,%nzi32\nxor %ltnzi32,%rx", 
-			"mov %rx,%ltnzi32\nsub %nzi32,%rx", "mov %rx,%ltnzi32\nsub %rx,%nzi32",
-			"mov %rx,%ltnzi32\nadd %nzi32,%rx", "mov %rx,%ltnzi32\nadd %rx,%nzi32");
+my @round2Condition1 =	("jz (ZF==1)","je (ZF==1)");
+my @round2TrueAsm1 = (	@round1TrueAsm1, 
+			"sub %rx,%rx", 
+			"mov %rx,%nzi32\nsub %rx,%nzi32", 
+			"mov %rx,0\nsub %rx,0",
+			"mov %rx,%nzi32\nxor %rx,%nzi32");
+my @round2FalseAsm1 = (	@round1FalseAsm1, 
+			"cmp %nzi32,%ltnzi32", 
+			"mov %rx,%ltnzi32\ncmp %rx,%nzi32",
+			"mov %rx,%nzi32\nxor %rx,%ltnzi32", 
+			"mov %rx,%ltnzi32\nsub %rx,%nzi32", 
+			"mov %rx,%ltnzi32\nadd %rx,%nzi32");
 
-my @round2Condition2 = ("jnz (ZF==0)", "jne (ZF==0)");
-my @round2TrueAsm2 = (@round2FalseAsm1);
-my @round2FalseAsm2 = (@round2TrueAsm1);
+my @round2Condition2 =	("jnz (ZF==0)", "jne (ZF==0)");
+my @round2TrueAsm2 =	@round2FalseAsm1;
+my @round2FalseAsm2 =	@round2TrueAsm1;
 
-my @round2Condition3 = ("ja (CF==0 AND ZF==0)","jnbe (CF==0 AND ZF==0)");
-my @round2TrueAsm3 = (@round1TrueAsm3, 
-			"mov %rx,%ltnzi32\nsub %nzi32,%rx",
-			"mov %rx,%ltnzi32\ncmp %nzi32,%rx");
-my @round2FalseAsm3 = (@round1FalseAsm3, 
-			"mov %rx,%nzi32\nsub %ltnzi32,%rx",
-			"mov %rx,%nzi32\ncmp %ltnzi32,%rx");
+my @round2Condition3 = 	("ja (CF==0 AND ZF==0)","jnbe (CF==0 AND ZF==0)");
+my @round2TrueAsm3 = (	@round1TrueAsm3, 
+			"mov %rx,%nzi32\nsub %rx,%ltnzi32",
+			"mov %rx,%nzi32\ncmp %rx,%ltnzi32");
+my @round2FalseAsm3 = (	@round1FalseAsm3, 
+			"mov %rx,%ltnzi32\nsub %rx,%nzi32",
+			"mov %rx,%ltnzi32\ncmp %rx,%nzi32");
 
-my @round2Condition4 = ("jb (CF==1)","jnae (CF==1)");
-my @round2TrueAsm4 = (@round2FalseAsm3);
-my @round2FalseAsm4 = (@round2TrueAsm3);
+my @round2Condition4 = 	("jb (CF==1)","jnae (CF==1)");
+my @round2TrueAsm4 =	@round2FalseAsm3;
+my @round2FalseAsm4 =	@round2TrueAsm3;
 
 my %round2TrueHash = ( join('-',@round2Condition1) => \@round2TrueAsm1, join('-',@round2Condition2) => \@round2TrueAsm2, join('-',@round2Condition3) => \@round2TrueAsm3, join('-',@round2Condition4) => \@round2TrueAsm4);
 my %round2FalseHash = ( join('-',@round2Condition1) => \@round2FalseAsm1, join('-',@round2Condition2) => \@round2FalseAsm2, join('-',@round2Condition3) => \@round2FalseAsm3, join('-',@round2Condition4) => \@round2FalseAsm4);
@@ -61,40 +74,40 @@ my %round2FalseHash = ( join('-',@round2Condition1) => \@round2FalseAsm1, join('
 #********ROUND 3************
 #***************************
 
-my @round3Condition1 = ("jz (ZF==0)","je (ZF==0)");
-my @round3TrueAsm1 = (@round2TrueAsm1, 
+my @round3Condition1 =	("jz (ZF==0)","je (ZF==0)");
+my @round3TrueAsm1 = (	@round2TrueAsm1, 
 			"push %nzi32\npop %rx\nxor %rx,%rx",
 			"push %nzi32\nmov %ry,%ltnzi32\npop %rx\nxor %rx,%rx",
 			"mov %rx,%nzi32\nmov %nzi32\nxor %rx,%ry");
-my @round3FalseAsm1 = (@round2FalseAsm1, 
+my @round3FalseAsm1 = (	@round2FalseAsm1, 
 			"push %nzi32\npop %rx\nxor %rx,%ltnzi32", 
 			"push %nzi32\nmov %ry,%ltnzi32\npop %rx\nxor %rx,%ltnzi32", 
 			"push %ltnzi32\npop %rx\nxor %rx,%nzi32");
 
-my @round3Condition2 = ("jnz (ZF==1)", "jne (ZF==1)");
-my @round3TrueAsm2 = (@round3FalseAsm1);
-my @round3FalseAsm2 = (@round3TrueAsm1);
+my @round3Condition2 =	("jnz (ZF==1)", "jne (ZF==1)");
+my @round3TrueAsm2 = 	@round3FalseAsm1;
+my @round3FalseAsm2 = 	@round3TrueAsm1;
 
-my @round3Condition3 = ("ja (CF==0 AND ZF==0)","jnbe (CF==0 AND ZF==0)");
-my @round3TrueAsm3 = (@round2TrueAsm3, 
+my @round3Condition3 = 	("ja (CF==0 AND ZF==0)","jnbe (CF==0 AND ZF==0)");
+my @round3TrueAsm3 = (	@round2TrueAsm3, 
 			"mov %rx,%ltnzi32\nsub %nzi32,%rx",
 			"mov %rx,%ltnzi32\ncmp %nzi32,%rx");
 #none of these will actually ever fail due to ZF==1, so it's safe to use them for just assuming CF==1
-my @round3FalseAsm3 = (@round2FalseAsm3, 
-			"mov %rx,%nzi32\nsub %ltnzi32,%rx",
-			"mov %rx,%nzi32\ncmp %ltnzi32,%rx");
+my @round3FalseAsm3 = (	@round2FalseAsm3, 
+			"mov %rx,%ltnzi32\nsub %rx,%nzi32",
+			"mov %rx,%ltnzi32\ncmp %rx,%nzi32");
 
 my @round3Condition4 = ("jb (CF==1)","jnae (CF==1)", "jc (CF == 1)");
-my @round3TrueAsm4 = (@round3FalseAsm3);
-my @round3FalseAsm4 = (@round3TrueAsm3);
+my @round3TrueAsm4 =	@round3FalseAsm3;
+my @round3FalseAsm4 =	@round3TrueAsm3;
 
 my @round3Condition5 = ("jae (CF==0)", "jnc (CF==0)");
-my @round3TrueAsm5 = (@round3TrueAsm3);
-my @round3FalseAsm5 = (@round3FalseAsm3);
+my @round3TrueAsm5 =	@round3TrueAsm3;
+my @round3FalseAsm5 =	@round3FalseAsm3;
 
-my @round3Condition6 = ("jbe (CF==1 OR ZF==1)", "jna (CF==1 OR ZF==1)");
-my @round3TrueAsm6 = (@round3TrueAsm4, @round3TrueAsm2); #all results have CF==1 or ZF==1
-my @round3FalseAsm6 = (@round3TrueAsm3, @round3FalseAsm2); #all results have CF==0 or ZF==0
+my @round3Condition6 = 	("jbe (CF==1 OR ZF==1)", "jna (CF==1 OR ZF==1)");
+my @round3TrueAsm6 = (	@round3TrueAsm4, @round3TrueAsm2); #all results have CF==1 or ZF==1
+my @round3FalseAsm6 = (	@round3TrueAsm3, @round3FalseAsm2); #all results have CF==0 or ZF==0
 
 my %round3TrueHash = ( join('-',@round3Condition1) => \@round3TrueAsm1, join('-',@round3Condition2) => \@round3TrueAsm2, join('-',@round3Condition3) => \@round3TrueAsm3, join('-',@round3Condition4) => \@round3TrueAsm4, join('-',@round3Condition5) => \@round3TrueAsm5, join('-',@round3Condition6) => \@round3TrueAsm6);
 my %round3FalseHash = ( join('-',@round3Condition1) => \@round3FalseAsm1, join('-',@round3Condition2) => \@round3FalseAsm2, join('-',@round3Condition3) => \@round3FalseAsm3, join('-',@round3Condition4) => \@round3FalseAsm4, join('-',@round3Condition5) => \@round3FalseAsm5, join('-',@round3Condition6) => \@round3FalseAsm6);
