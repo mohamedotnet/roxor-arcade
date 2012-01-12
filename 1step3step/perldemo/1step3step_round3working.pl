@@ -112,8 +112,11 @@ my @round3FalseAsm6 = (	@round3TrueAsm3, @round3FalseAsm2); #all results have CF
 my %round3TrueHash = ( join('-',@round3Condition1) => \@round3TrueAsm1, join('-',@round3Condition2) => \@round3TrueAsm2, join('-',@round3Condition3) => \@round3TrueAsm3, join('-',@round3Condition4) => \@round3TrueAsm4, join('-',@round3Condition5) => \@round3TrueAsm5, join('-',@round3Condition6) => \@round3TrueAsm6);
 my %round3FalseHash = ( join('-',@round3Condition1) => \@round3FalseAsm1, join('-',@round3Condition2) => \@round3FalseAsm2, join('-',@round3Condition3) => \@round3FalseAsm3, join('-',@round3Condition4) => \@round3FalseAsm4, join('-',@round3Condition5) => \@round3FalseAsm5, join('-',@round3Condition6) => \@round3FalseAsm6);
 
-srand();
+###########################################################
+#BEGIN GAME CODE
+###########################################################
 
+srand();
 $SIG{INT} = \&forceExit;
 $currentScore = 0;
 
