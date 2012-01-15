@@ -24,7 +24,7 @@
 @round1TrueAsm3 = (	"mov %rx,%nzi32\ncmp %rx,%ltnzi32", 
 			"mov %rx,%nzi32\nsub %rx,%ltnzi32");
 @round1FalseAsm3 = (	"mov %rx,%ltnzi32\ncmp %rx,%nzi32", 
-			"mov %rx,%ltnzi32\nsub%rx,%nzi32");
+			"mov %rx,%ltnzi32\nsub %rx,%nzi32");
 
 @round1Condition4 = 	("jb (CF==1)");
 @round1TrueAsm4 =	@round1FalseAsm3;
@@ -129,236 +129,44 @@ print "determine whether a conditional statement will evaluate\n";
 print "to true or not. Press 1 if you think the jump will be\n";
 print "taken, press 0 if you think it will not be taken.\n";
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-print "ROUND 1: 1000 points needed to pass\n";
+print "ROUND 1: 1000 points needed to pass, 100 points per question.\n";
 
 
-while($currentScore < 1000){
-	$conditionTruth = int(rand(2));
-#	print "conditionTruth = $conditionTruth\n";
-	if($conditionTruth){
-		#This is where we're using round1TrueHash
-		#print "trying to print the hash" . keys(%round1TrueHash) . "\n";
-		@roundKeys = keys %round1TrueHash;
-		$tmp = @roundKeys;
-		#print "number of keys in round1TrueHash = $tmp \n";
-		#print "roundKeys = @roundKeys \n";
-		$condition = int(rand($tmp));
-		#print "random condition = $condition\n";
-		@key = $roundKeys[$condition];
-		#print "we randomly selected key @key \n";
-		$tmp = @round1TrueHash{@key};
-		@asmStatements = @$tmp;
-		#print "asmStatements = @asmStatements\n";
-		$numStatements = @asmStatements;
-		$randStatement = int(rand($numStatements));
-		print "------------\n";
-		$randomStatement = $asmStatements[$randStatement];
-		$interpolatedAsmStatement = asmInterpolate($randomStatement);
-		print "$interpolatedAsmStatement\n";
-#		print "$randomStatement\n";
-		print "@key\n";	
-	}
-	else{
-		#This is where we're using round1FalseHash
-		@roundKeys = keys %round1FalseHash;
-		$tmp = @roundKeys;
-		$condition = int(rand($tmp));
-		@key = $roundKeys[$condition];
-		$tmp = @round1FalseHash{@key};
-		@asmStatements = @$tmp;
-		$numStatements = @asmStatements;
-		$randStatement = int(rand($numStatements));
-		print "------------\n";
-		$randomStatement = $asmStatements[$randStatement];
-		$interpolatedAsmStatement = asmInterpolate($randomStatement);
-		print "$interpolatedAsmStatement\n";
-#		print "$randomStatement\n";
-		print "@key\n";
-	}
+RoundWrapper(1000, 100, \%round1TrueHash, \%round1FalseHash);
 
-	print "Enter q to quit.\n";
-	print "If the condition will be taken, enter 1, otherwise enter 0: ";
-	chomp($userInput = <STDIN>);
-	if($userInput eq 'q'){
-		$currentScore = $currentScore / 100;
-		exit($currentScore);
-	}
-	if($userInput == $conditionTruth){
-		print "Correct! :D \n";
-		$currentScore += 100;
-		print "You gained 100 points, and now have $currentScore points\n";
-	}
-	else{
-		print "Incorrect :( \n";
-		$currentScore -= 200;
-		print "You lost 200 points, and now have $currentScore points\n";
-	}
-}
 print "-------------LEVEL 1 COMPLETED---------------\n";
 print "On to round 2!\n";
-print "ROUND 2: 2000 points needed to pass\n";
+print "ROUND 2: 2000 points needed to pass, 100 points per question.\n";
 
-while($currentScore < 2000){
-	$conditionTruth = int(rand(2));
-#	print "conditionTruth = $conditionTruth\n";
-	if($conditionTruth){
-		#This is where we're using round1TrueHash
-		#print "trying to print the hash" . keys(%round2TrueHash) . "\n";
-		@roundKeys = keys %round2TrueHash;
-		$tmp = @roundKeys;
-		#print "number of keys in round2TrueHash = $tmp \n";
-		#print "roundKeys = @roundKeys \n";
-		$condition = int(rand($tmp));
-		#print "random condition = $condition\n";
-		$tmpRef = $roundKeys[$condition];
-		#print "tmpRef = $tmpRef\n";
-		@mnemonics = split('-',$tmpRef);
-		#print "mnemonics = @mnemonics\n";
-		$numMnemonics = @mnemonics;
-		$randMnemonic = int(rand($numMnemonics));
-		#print "randMnemonic = $randMnemonic\n";
-		$mnemonic = $mnemonics[$randMnemonic];
-		#print "we randomly selected key $mnemonic \n";
-		$tmp = @round2TrueHash{$tmpRef};
-		@asmStatements = @$tmp;
-		#print "asmStatements = @asmStatements\n";
-		$numStatements = @asmStatements;
-		$randStatement = int(rand($numStatements));
-		print "------------\n";
-		$randomStatement = $asmStatements[$randStatement];
-		$interpolatedAsmStatement = asmInterpolate($randomStatement);
-		print "$interpolatedAsmStatement\n";
-#		print "$randomStatement\n";
-		print "$mnemonic\n";	
-	}
-	else{
-		#This is where we're using round1TrueHash
-		@roundKeys = keys %round2FalseHash;
-		$tmp = @roundKeys;
-		$condition = int(rand($tmp));
-		$tmpRef = $roundKeys[$condition];
-		@mnemonics = split('-',$tmpRef);
-		$numMnemonics = @mnemonics;
-		$randMnemonic = int(rand($numMnemonics));
-		$mnemonic = $mnemonics[$randMnemonic];
-		$tmp = @round2FalseHash{$tmpRef};
-		@asmStatements = @$tmp;
-		$numStatements = @asmStatements;
-		$randStatement = int(rand($numStatements));
-		print "------------\n";
-		$randomStatement = $asmStatements[$randStatement];
-		$interpolatedAsmStatement = asmInterpolate($randomStatement);
-		print "$interpolatedAsmStatement\n";
-#		print "$randomStatement\n";
-		print "$mnemonic\n";	
-	}
+RoundWrapper(2000, 100, \%round2TrueHash, \%round2FalseHash);
 
-	print "Enter q to quit.\n";
-	print "If the condition will be taken, enter 1, otherwise enter 0: ";
-	chomp($userInput = <STDIN>);
-	if($userInput eq 'q'){
-		exit($currentScore);
-	}
-	if($userInput == $conditionTruth){
-		print "Correct! :D \n";
-		$currentScore += 200;
-		print "You gained 200 points, and now have $currentScore points\n";
-	}
-	else{
-		print "Incorrect :( \n";
-		$currentScore -= 400;
-		print "You lost 400 points, and now have $currentScore points\n";
-	}
-}
 print "-------------LEVEL 2 COMPLETED---------------\n";
 print "On to round 3!\n";
-print "ROUND 3: 4000 points needed to pass\n";
+print "ROUND 3: 4000 points needed to pass, 200 points per question.\n";
 
-while($currentScore < 4000){
-	$conditionTruth = int(rand(2));
-#	print "conditionTruth = $conditionTruth\n";
-	if($conditionTruth){
-		#This is where we're using round3TrueHash
-		#print "trying to print the hash" . keys(%round3TrueHash) . "\n";
-		@roundKeys = keys %round3TrueHash;
-		$tmp = @roundKeys;
-		#print "number of keys in round2FalseHash = $tmp \n";
-		#print "roundKeys = @roundKeys \n";
-		$condition = int(rand($tmp));
-		#print "random condition = $condition\n";
-		$tmpRef = $roundKeys[$condition];
-		#print "tmpRef = $tmpRef\n";
-		@mnemonics = split('-',$tmpRef);
-		#print "mnemonics = @mnemonics\n";
-		$numMnemonics = @mnemonics;
-		$randMnemonic = int(rand($numMnemonics));
-		#print "randMnemonic = $randMnemonic\n";
-		$mnemonic = $mnemonics[$randMnemonic];
-		#print "we randomly selected key $mnemonic \n";
-		$tmp = @round3TrueHash{$tmpRef};
-		@asmStatements = @$tmp;
-		#print "asmStatements = @asmStatements\n";
-		$numStatements = @asmStatements;
-		$randStatement = int(rand($numStatements));
-		print "------------\n";
-		$randomStatement = $asmStatements[$randStatement];
-		$interpolatedAsmStatement = asmInterpolate($randomStatement);
-		print "$interpolatedAsmStatement\n";
-		#print "$randomStatement\n";
-		print "$mnemonic\n";	
-	}
-	else{
-		#This is where we're using round3TrueHash
-		#print "trying to print the hash" . keys(%round3TrueHash) . "\n";
-		@roundKeys = keys %round3FalseHash;
-		$tmp = @roundKeys;
-		#print "number of keys in round3FalseHash = $tmp \n";
-		#print "roundKeys = @roundKeys \n";
-		$condition = int(rand($tmp));
-		#print "random condition = $condition\n";
-		$tmpRef = $roundKeys[$condition];
-		#print "tmpRef = $tmpRef\n";
-		@mnemonics = split('-',$tmpRef);
-		#print "mnemonics = @mnemonics\n";
-		$numMnemonics = @mnemonics;
-		$randMnemonic = int(rand($numMnemonics));
-		#print "randMnemonic = $randMnemonic\n";
-		$mnemonic = $mnemonics[$randMnemonic];
-		#print "we randomly selected key $mnemonic \n";
-		$tmp = @round3FalseHash{$tmpRef};
-		@asmStatements = @$tmp;
-		#print "asmStatements = @asmStatements\n";
-		$numStatements = @asmStatements;
-		$randStatement = int(rand($numStatements));
-		print "------------\n";
-		$randomStatement = $asmStatements[$randStatement];
-		$interpolatedAsmStatement = asmInterpolate($randomStatement);
-		print "$interpolatedAsmStatement\n";
-		#print "$randomStatement\n";
-		print "$mnemonic\n";	
-	}
+RoundWrapper(4000, 200, \%round3TrueHash, \%round3FalseHash);
 
-	print "Enter q to quit.\n";
-	print "If the condition will be taken, enter 1, otherwise enter 0: ";
-	chomp($userInput = <STDIN>);
-	if($userInput eq 'q'){
-		exit($currentScore);
-	}
-	if($userInput == $conditionTruth){
-		print "Correct! :D \n";
-		$currentScore += 400;
-		print "You gained 400 points, and now have $currentScore points\n";
-	}
-	else{
-		print "Incorrect :( \n";
-		$currentScore -= 800;
-		print "You lost 800 points, and now have $currentScore points\n";
-	}
-}
 print "-------------LEVEL 3 COMPLETED---------------\n";
 print "WINNER WINNER CHICKEN DINNER!\n";
 print "That's all for now. Check out the code and think about how\n";
-print "to turn this into a real game!\n";
+print "to improve this game!\n";
+print "http://www.ascii-fr.com/-Chicken-.html\n";
+print "      ,~.\n";
+print "   ,-'__ `-,\n";
+print "  {,-'  `. }              ,')\n";
+print " ,( a )   `-.__         ,',')~,\n";
+print "<=.) (         `-.__,==' ' ' '}\n";
+print "  (   )                      /)\n";
+print "   `-'\\   ,                    )\n";
+print "       |  \\        `~.        /\n";
+print "       \\   `._        \\      /\n";
+print "        \\     `._____,'    ,'\n";
+print "         `-.             ,'\n";
+print "            `-._     _,-'\n";
+print "                77jj'\n";
+print "               //_||\n";
+print "            __//--'/`          hjw\n";
+print "          ,--'/`  '\n";
 
 
 sub asmInterpolate{
@@ -391,21 +199,24 @@ sub asmInterpolate{
 	$numRegs = @generalRegisters;
 	#used for %rx
 	$regX = $generalRegisters[int(rand($numRegs))];
-	#used for %ry
-	$regY = $generalRegisters[int(rand($numRegs))];
+        #used for %ry
+        $regY = $regX;
+        #Want to make sure it's different
+        while($regY eq $regX){
+                $regY = $generalRegisters[int(rand($numRegs))];
+        }
 
 #	print "Input string: $asmString\n";
 	$asmString =~ s/%rx/$regX/g;
-	$asmString =~ s/%ry/$regX/g;
+	$asmString =~ s/%ry/$regY/g;
 	$asmString =~ s/%i32/$i32_hexstr/g;
 	$asmString =~ s/%-i32/$neg_i32_hexstr/g;
 	$asmString =~ s/%nzi32/$nonZero_i32_hexstr/g;
 	$asmString =~ s/%lti32/$lessThani32_hexstr/g;
 	$asmString =~ s/%ltnzi32/$lessThanNonZeroi32_hexstr/g;
-#	print "Output string: $asmString\n";
+#	print "$asmString\n";
 
 	return $asmString;
-
 }
 
 sub forceExit{
@@ -413,3 +224,83 @@ sub forceExit{
 	print("caugt SIG{INT}, returning currentScore = $currentScore\n");
 	exit($currentScore);
 }
+
+#Parameters
+#$_[0] = the total score >= which to exit this round
+#$_[1] = the amount of points added when answering correctly
+#$_[2] = reference to the hash containing the true statements
+#$_[3] = reference to the hash containing the false statements
+sub RoundWrapper{
+        $exitRoundScore = $_[0];
+        $correctAnswerPoints = $_[1];
+        $refRoundTrueHash = $_[2];
+        $refRoundFalseHash = $_[3];
+
+
+	while($currentScore < $exitRoundScore){
+		$conditionTruth = int(rand(2));
+		if($conditionTruth){
+			#This is where we're using round1TrueHash
+			#print "trying to print the hash" . keys(%{$refRoundTrueHash}) . "\n";
+			@roundKeys = keys %{$refRoundTrueHash};
+			$tmp = @roundKeys;
+			#print "number of keys in refRoundTrueHash = $tmp \n";
+			#print "roundKeys = @roundKeys \n";
+			$condition = int(rand($tmp));
+			#print "random condition = $condition\n";
+			@key = $roundKeys[$condition];
+			#print "we randomly selected key @key \n";
+			$tmp = @{$refRoundTrueHash}{@key};
+			@asmStatements = @$tmp;
+			#print "asmStatements = @asmStatements\n";
+			$numStatements = @asmStatements;
+			$randStatement = int(rand($numStatements));
+			print "------------\n";
+			$randomStatement = $asmStatements[$randStatement];
+			$interpolatedAsmStatement = asmInterpolate($randomStatement);
+			print "$interpolatedAsmStatement\n";
+	#		print "$randomStatement\n";
+			print "@key\n";	
+		}
+		else{
+			#This is where we're using round1FalseHash
+			@roundKeys = keys %{$refRoundFalseHash};
+			$tmp = @roundKeys;
+			$condition = int(rand($tmp));
+			@key = $roundKeys[$condition];
+			$tmp = @{$refRoundFalseHash}{@key};
+			@asmStatements = @$tmp;
+			$numStatements = @asmStatements;
+			$randStatement = int(rand($numStatements));
+			print "------------\n";
+			$randomStatement = $asmStatements[$randStatement];
+			$interpolatedAsmStatement = asmInterpolate($randomStatement);
+			print "$interpolatedAsmStatement\n";
+	#		print "$randomStatement\n";
+			print "@key\n";
+		}
+	
+		print "Enter q to quit.\n";
+		print "If the condition will be taken, enter 1, otherwise enter 0: ";
+		chomp($userInput = <STDIN>);
+		if($userInput eq 's'){
+			print("~tweeEEtle deeEEtle deeEEt~ s00p3r s3kr47 level skipping warp whistle enabled!\n");
+			last;
+		}
+		if($userInput eq 'q'){
+			$currentScore = $currentScore / 100;
+			exit($currentScore);
+		}
+		if($userInput == $conditionTruth){
+			print "Correct! :D \n";
+			$currentScore += $correctAnswerPoints;
+			print "You gained $correctAnswerPoints points, and now have $currentScore points\n";
+		}
+		else{
+			print "Incorrect :( \n";
+			$currentScore -= 2*$correctAnswerPoints;
+			print "You lost " . 2*$correctAnswerPoints . " points, and now have $currentScore points\n";
+		}
+	}
+
+}#end RoundWrapper

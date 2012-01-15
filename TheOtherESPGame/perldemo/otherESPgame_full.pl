@@ -49,6 +49,9 @@ while($currentScore < 1000){
 	$numSeconds = localtime();
 	$orientation = 0;
 	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
+	if($correctness == 1337){
+		last;
+	}
 	ScoreKeeper($correctness, 100, 9999);
 }
 
@@ -82,6 +85,9 @@ while($currentScore < 3000){
 	$timeBonus = timelocal(localtime());
 	$orientation = 0;
 	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
+	if($correctness == 1337){
+		last;
+	}
 	$timeBonus = timelocal(localtime()) - $timeBonus;
 #	print "timeBonus = $timeBonus\n";
 	ScoreKeeper($correctness, 200, $timeBonus);
@@ -121,6 +127,9 @@ while($currentScore < 5000){
 	$timeBonus = timelocal(localtime());
 	$orientation = int(rand(2));
 	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
+	if($correctness == 1337){
+		last;
+	}
 	$timeBonus = timelocal(localtime()) - $timeBonus;
 #	print "timeBonus = $timeBonus\n";
 	ScoreKeeper($correctness, 200, $timeBonus);
@@ -161,6 +170,9 @@ while($currentScore < 9000){
 	$timeBonus = timelocal(localtime());
 	$orientation = int(rand(4));
 	$correctness = StackPrint($orientation, $numStackElements, $ebpIndex, $espIndex, $indexToFind, 0, 6);
+	if($correctness == 1337){
+		last;
+	}
 	$timeBonus = timelocal(localtime()) - $timeBonus;
 #	print "timeBonus = $timeBonus\n";
 	ScoreKeeper($correctness, 400, $timeBonus);
@@ -278,7 +290,7 @@ nextWhile:
 
 	print "Enter q to quit.\n";
 	print "Enter the combination of number and letter (like \"a1\", \"b4\", etc) for the offset to:\n";
-	print "$randStackStuff[$indexToFind]\n";
+	print "__________$randStackStuff[$indexToFind]__________\n";
 	print "a) ebp, b) esp\n";
 	for ($i = 0; $i < @displayOrder; $i++){
 		$tmp = $displayOrder[$i]*4; #TODO: Change this 4 to 8 in the future for 64 bit version
@@ -288,6 +300,10 @@ nextWhile:
 	print "> ";
 
 	chomp($userInput = <STDIN>);
+	if($userInput eq 's'){
+		print("~tweeEEtle deeEEtle deeEEt~ s00p3r s3kr47 level skipping warp whistle enabled!\n");
+		return 1337;
+	}
 	if($userInput eq 'q'){
                 print "You entered q, quitting. Returning currentScore of $currentScore\n";
                 exit($currentScore / 100);

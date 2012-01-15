@@ -75,7 +75,7 @@ while(1){
 	}
 	case 1 {
 		#DarkMathemagic
-		$returnScore = system("perl DarkMathemagic/perldemo/DarkMathemagic_round1working.pl");
+		$returnScore = system("perl DarkMathemagic/perldemo/DarkMathemagic_round2working.pl");
 		$returnScore = ($returnScore >> 8);
 		if($returnScore & 128){
 			$returnScore = 256 - $returnScore;
@@ -122,8 +122,8 @@ while(1){
 		exit(0x0ddba11);
 	}
 	case 'q' {
-		print "A curious arcade. The only winning move is to play a LOT!\n";
-		system(" say \"A curious arcade. The only winning move is to play a LOT!\"");
+		print "A curious arcade. The only winning move is to play. A LOT!\n";
+		system(" say \"A curious arcade. The only winning move is to play. A LOT!\"");
 		exit(0x31337);
 	}
 	else{

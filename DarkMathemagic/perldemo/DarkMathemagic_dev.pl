@@ -28,6 +28,10 @@
 #interpolated to: $nonOverflowingLessThanNonZeroi32
 #%nultnzi32 = value less than %nzi32 which can be subtracted from %nzi32 and not cause an underflow
 #interpolated to: $nonUnerflowingLessThanNonZeroi32
+#%moi32 = non-zero randomly selected 32 bit integer which when added to nzi32 *must* cause a 32 bit overflow
+#interpolated to: $mustOverflow_i32
+#%mui32 = non-zero randomly selected 32 bit integer which when subtracted from nzi32 *must* cause a 32 bit underflow
+#interpolated to: $mustUnderflow_i32
 
 
 #***************************
@@ -35,10 +39,10 @@
 #***************************
 
 #These are the asm statements the user will see
-@round0Asm = (	"mov %rx,%nzi16\nadd %rx, %ltnzi16", 
-		"mov %rx,%nzi16\nmov %ry, %ltnzi16\nadd %rx, %ry",
-		"mov %rx,%nzi16\nsub %rx, %ltnzi16", 
-		"mov %rx,%nzi16\nmov %ry, %ltnzi16\nsub %rx, %ry");
+@round0Asm = (	"mov %rx, %nzi16\nadd %rx, %ltnzi16", 
+		"mov %rx, %nzi16\nmov %ry, %ltnzi16\nadd %rx, %ry",
+		"mov %rx, %nzi16\nsub %rx, %ltnzi16", 
+		"mov %rx, %nzi16\nmov %ry, %ltnzi16\nsub %rx, %ry");
 
 #These are the perl statements which do the equivalent math behind the scenes.
 #The statements should use variable names which will already exist in the function asmInterpolate()
@@ -52,10 +56,10 @@
 #***************************
 
 #These are the asm statements the user will see
-@round1Asm = (	"mov %rx,%nzi32\nadd %rx, %noltnzi32", 
-		"mov %rx,%nzi32\nmov %ry, %noltnzi32\nadd %rx, %ry",
-		"mov %rx,%nzi32\nsub %rx, %noltnzi32", 
-		"mov %rx,%nzi32\nmov %ry, %noltnzi32\nsub %rx, %ry");
+@round1Asm = (	"mov %rx, %nzi32\nadd %rx, %noltnzi32", 
+		"mov %rx, %nzi32\nmov %ry, %noltnzi32\nadd %rx, %ry",
+		"mov %rx, %nzi32\nsub %rx, %noltnzi32", 
+		"mov %rx, %nzi32\nmov %ry, %noltnzi32\nsub %rx, %ry");
 
 #These are the perl statements which do the equivalent math behind the scenes.
 #The statements should use variable names which will already exist in the function asmInterpolate()
@@ -71,17 +75,17 @@
 #********ROUND 2************
 #***************************
 
-@round2Asm = (	"mov %rx,%nzi32\nadd %rx, %ltnzi32", 
-		"mov %rx,%nzi32\nmov %ry, %ltnzi32\nadd %rx, %ry",
-		"mov %rx,%nzi32\nsub %rx, %ltnzi32", 
-		"mov %rx,%nzi32\nmov %ry, %ltnzi32\nsub %rx, %ry");
+@round2Asm = (	"mov %rx, %nzi32\nadd %rx, %moi32", 
+		"mov %rx, %nzi32\nmov %ry, %moi32\nadd %rx, %ry",
+		"mov %rx, %nzi32\nsub %rx, %mui32", 
+		"mov %rx, %nzi32\nmov %ry, %mui32\nsub %rx, %ry");
 
 #These are the perl statements which do the equivalent math behind the scenes.
 #The statements should use variable names which will already exist in the function asmInterpolate()
-@round2Perl = (	"$result = $nonZero_i32 + $lessThanNonZeroi32",
-		"$result = $nonZero_i32 + $lessThanNonZeroi32",
-		"$result = $nonZero_i32 - $lessThanNonZeroi32",
-		"$result = $nonZero_i32 - $lessThanNonZeroi32");
+@round2Perl = (	'$result = $nonZero_i32 + $mustOverflow_i32',
+		'$result = $nonZero_i32 + $mustOverflow_i32',
+		'$result = $nonZero_i32 - $mustUnderflow_i32',
+		'$result = $nonZero_i32 - $mustUnderflow_i32');
 
 #***************************
 #********ROUND 3************
@@ -139,7 +143,9 @@ print "-------------LEVEL 0 COMPLETED---------------\n";
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 print "In this round you will now be using 32 bit values instead\n";
 print "of 16 bit. These values are picked specifically to not\n";
-print "You can try a few by hand, but then you can use a \n";
+print "overflow the range. We will talk about that in the next\n";
+print "level...if you can get there!\n";
+print "You should try a few by hand, but then you can use a \n";
 print "calculator if you want.\n";
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 print "ROUND 1: 2000 points needed to pass, 100 points per answer\n";
@@ -148,13 +154,21 @@ RoundWrapper(2000,100,\@round1Asm,\@round1Perl);
 
 print "-------------LEVEL 1 COMPLETED---------------\n";
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-print "\n";
+print "This round introduces the ability for the selected numbers\n";
+print "to overflow and underflow the maximum range. What that \n";
+print "means is, when you are counting numbers, or adding numbers\n";
+print "and you only have 32 bits, then when you get to the maximum\n";
+print "number (2^32, 0xFFFFFFFF), and you add 1, it will have to\n";
+print "wrap back around (overflow) and resume counting up from 0.\n";
+print "Similarly, if you are counting down, or subtracting numbers\n";
+print "and you get to 0, and try to subtract 1, it will have to\n";
+print "wrap back around (underflow), and resume counting down from\n";
+print "the maximum number, 0xFFFFFFFF.\n";
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-print "ROUND 2: 4000 points needed to pass\n";
+print "ROUND 2: 4000 points needed to pass, 200 points per answer.\n";
 
-#while($currentScore < 4000){
+RoundWrapper(4000,200,\@round2Asm,\@round2Perl);
 
-#}
 print "-------------LEVEL 2 COMPLETED---------------\n";
 print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 print "\n";
@@ -171,7 +185,7 @@ print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
 print "WINNER WINNER CHICKEN DINNER!\n";
 print "That's all for now. Check out the code and think about how\n";
-print "to turn this into a real game!\n";
+print "to improve this game!\n";
 print "http://www.ascii-fr.com/-Chicken-.html\n";
 print "      ,~.\n";
 print "   ,-'__ `-,\n";
@@ -243,53 +257,74 @@ sub asmInterpolate{
 	$asmString = $_[0];
 	$evalString = $_[1];
 
-	#16 BIT VALUES
+	###################################16 BIT VALUES
 	#used for %i16
 	$i16 = int(rand(0x10000));
 	$i16_hexstr = sprintf("0x%04x",$i16);
 #	print "i16 = $i16_hexstr\n";
+
 	#used for %nzi16
 	$nonZero_i16 = int(rand(0xFFFF))+1;
 	$nonZero_i16_hexstr = sprintf("0x%04x", $nonZero_i16);
 #	print "nonZero_i16 = $nonZero_i16_hexstr\n";
+
 	#used for %lti16
 	$lessThani16 = int(rand($i16));
 	$lessThani16_hexstr = sprintf("0x%04x",$lessThani16);
 #	print "lessThani16 = $lessThani16_hexstr\n";
+
 	#used for %ltnzi16
 	$lessThanNonZeroi16 = int(rand($nonZero_i16));
 	$lessThanNonZeroi16_hexstr = sprintf("0x%04x",$lessThanNonZeroi16);
 #	print "lessThanNonZeroi16 = $lessThanNonZeroi16_hexstr\n";
 
-	#32 BIT VALUES
+
+	####################################32 BIT VALUES
 	#used for %i32
 	$i32 = int(rand(0x100000000));
 	$i32_hexstr = sprintf("0x%08x",$i32);
 #	print "i32 = $i32_hexstr\n";
+
 	#used for %-i32
 	$neg_i32 = -$i32;
 	$neg_i32_hexstr = sprintf("0x%08x",$neg_i32);
 #	print "neg_i32 = $neg_i32_hexstr\n";
+
 	#used for %nzi32
 	$nonZero_i32 = int(rand(0xFFFFFFFF))+1;
 	$nonZero_i32_hexstr = sprintf("0x%08x", $nonZero_i32);
-#	print "nonZero_i32 = $nonZero_i32_hexstr\n";
+	print "nonZero_i32 = $nonZero_i32_hexstr\n";
+
 	#used for %lti32
 	$lessThani32 = int(rand($i32));
 	$lessThani32_hexstr = sprintf("0x%08x",$lessThani32);
 #	print "lessThani32 = $lessThani32_hexstr\n";
+
 	#used for %ltnzi32
 	$lessThanNonZeroi32 = int(rand($nonZero_i32));
 	$lessThanNonZeroi32_hexstr = sprintf("0x%08x",$lessThanNonZeroi32);
 #	print "lessThanNonZeroi32 = $lessThanNonZeroi32_hexstr\n";
+
 	#used for %noltnzi32
 	$nonOverflowingLessThanNonZeroi32 = int(rand(min($nonZero_i32, ($MAX_32BIT_INT - $nonZero_i32))));
 	$nonOverflowingLessThanNonZeroi32_hexstr = sprintf("0x%08x",$nonOverflowingLessThanNonZeroi32);
-	print "nonOverflowingLessThanNonZeroi32 = $nonOverflowingLessThanNonZeroi32_hexstr\n";
+#	print "nonOverflowingLessThanNonZeroi32 = $nonOverflowingLessThanNonZeroi32_hexstr\n";
+
 	#used for %nultnzi32
 	$nonUnderflowingLessThanNonZeroi32 = int(rand(min($nonZero_i32, ($MAX_32BIT_INT - $nonZero_i32))));
 	$nonUnderflowingLessThanNonZeroi32_hexstr = sprintf("0x%08x",$nonUnderflowingLessThanNonZeroi32);
-	print "nonUnderflowingLessThanNonZeroi32 = $nonUnderflowingLessThanNonZeroi32_hexstr\n";
+#	print "nonUnderflowingLessThanNonZeroi32 = $nonUnderflowingLessThanNonZeroi32_hexstr\n";
+
+	#used for %moi32
+	$mustOverflow_i32 = (int(rand(0xFFFFFFFF))+1)+(0x100000000-$nonZero_i32);
+	$mustOverflow_i32_hexstr = sprintf("0x%08x", $mustOverflow_i32);
+#	print "mustOverflow_i32 = $mustOverflow_i32_hexstr\n";
+
+	#used for %mui32
+	$mustUnderflow_i32 = (int(rand(0xFFFFFFFF))+1)+($nonZero_i32);
+	$mustUnderflow_i32_hexstr = sprintf("0x%08x", $mustUnderflow_i32);
+#	print "mustUnderflow_i32 = $mustUnderflow_i32_hexstr\n";
+
 
 	#pick some useful registers
 	@generalRegisters = ("eax", "ebx", "ecx", "edx", "edi", "esi");
@@ -319,14 +354,31 @@ sub asmInterpolate{
 	$asmString =~ s/%ltnzi32/$lessThanNonZeroi32_hexstr/g;
 	$asmString =~ s/%noltnzi32/$nonOverflowingLessThanNonZeroi32_hexstr/g;
 	$asmString =~ s/%nultnzi32/$nonUnderflowingLessThanNonZeroi32_hexstr/g;
+	$asmString =~ s/%moi32/$mustOverflow_i32_hexstr/g;
+	$asmString =~ s/%mui32/$mustUnderflow_i32_hexstr/g;
 	print "$asmString\n";
 
 	print "evalString = " . $evalString . "\n";
 	eval $evalString;
 	printf("After eval, result = %#x\n", $result);
 
+	#This makes it so that in the overflowing case we stick to 32 bits
+	$result = 0x0FFFFFFFF & $result;
+	printf("After masking, result = %#x\n", $result);	
+
+
+	print "Enter q to quit, or\n";
 	print "Enter the hex value (with or without 0x) in the $regX register: ";
 	chomp($userInput = <STDIN>);
+	if($userInput eq 's'){
+		print("~tweeEEtle deeEEtle deeEEt~ s00p3r s3kr47 level skipping warp whistle enabled!\n");
+		last;
+	}
+	if($userInput eq 'q'){
+		$currentScore = $currentScore / 100;
+		exit($currentScore);
+ 	}
+
 	printf("userInput = %#x\n", hex($userInput));
 	
         if(hex($userInput) == $result){
@@ -337,7 +389,4 @@ sub asmInterpolate{
                 printf("%#x is incorrect :( Answer was %#x\n", $userInput, $result);
                 return 0;
         }
-        
-
-
 }
