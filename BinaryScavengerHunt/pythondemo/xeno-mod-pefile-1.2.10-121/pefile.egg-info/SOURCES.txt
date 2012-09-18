@@ -1,0 +1,8 @@
+README
+pefile.py
+peutils.py
+setup.py
+pefile.egg-info/PKG-INFO
+pefile.egg-info/SOURCES.txt
+pefile.egg-info/dependency_links.txt
+pefile.egg-info/top_level.txt

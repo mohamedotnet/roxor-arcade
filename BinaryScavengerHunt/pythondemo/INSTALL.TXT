@@ -1,0 +1,19 @@
+In order to run this example code, you must do the following:
+cd xeno-mod-pefile-1.2.10-121
+python setup.py install
+
+Then you can play the game by typing
+python BinHunt.py
+
+NOTE: if you want to actually run the randomly generated
+executables, you must have the Visual C++ 2010 (x86 or x64
+depending on your system) redistributable libraries installed
+x86: http://www.microsoft.com/en-us/download/details.aspx?id=5555
+x64: http://www.microsoft.com/en-us/download/details.aspx?id=14632
+
+.exe files can be just run normally
+.dll files can be tested by doing:
+rundll32.exe <C:\path\to\the.dll>,SayHello
+And you should then see a message box saying hello
+
+Enjoy!
