@@ -341,7 +341,7 @@ def R1Q5(questionCounter):
     isDll = "Y"
     
   numFlagsSet = 1
-  if isDLL:
+  if isDll:
     numFlagsSet += 1
   #decide whether to twiddle the bits
   x = random.randint(0,1)
@@ -390,6 +390,7 @@ def Round1(seed):
   global gScore
   global gNextLevelRequiredScore
 
+  startTime = int(time())
   gNextLevelRequiredScore = 1000
   random.seed(seed)
   questionCounter = 0;
@@ -405,4 +406,7 @@ def Round1(seed):
      5:R1Q5}[q](questionCounter)
     questionCounter+=1
 
-  print "Congratulations, you passed round 1!"
+  totalTime = int(time()) - startTime
+  totalMinutes = totalTime / 3600
+  totalSeconds = totalTime % 3600
+  print "\nCongratulations, you passed round 1! (in %u minutes, %u seconds)\n" % (totalMinutes, totalSeconds)
