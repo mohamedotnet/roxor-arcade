@@ -19,66 +19,14 @@ import os
 import random
 import pefile
 from time import time
-
-#player's current score
-gScore = 0
-gNextLevelRequiredScore = 0
-
-def CheckAnswerNum(studentAnswer, answerRadix, correctAnswer):
-  global gScore
-  global gNextLevelRequiredScore
-
-  #ch347 0xc0d3zzz
-  if studentAnswer == "s":
-    gScore = gNextLevelRequiredScore
-    print "~tweeEEtle deeEEtle deeEEt~ W4Rp W1zzL3 4 5h1zzl3!"
-    return
-
-  print studentAnswer
-  #ch347 0xc0d3zzz
-  if studentAnswer == "x":
-    gScore += 100
-    print "BOOM! FREE LUNCH! Score = %u" % gScore
-    return
-
-  if int(studentAnswer,answerRadix) == int(correctAnswer):
-    gScore += 100
-    print "Correct! Score = %u" % gScore
-  else:
-    gScore -= 200
-    if answerRadix == 16:
-      print "Incorrect. The answer was %x\n Score = %u" % (correctAnswer, gScore)
-    elif answerRadix == 10:
-      print "Incorrect. The answer was %u\n Score = %u" % (correctAnswer, gScore)
-
-def CheckAnswerString(studentAnswer, correctAnswer):
-  global gScore
-  global gNextLevelRequiredScore
-
-  #ch347 0xc0d3zzz
-  if studentAnswer == "s":
-    gScore = gNextLevelRequiredScore
-    print "~tweeEEtle deeEEtle deeEEt~ W4Rp W4zzL3 4 5h4zzl3!"
-    return
-
-  #ch347 0xc0d3zzz
-  if studentAnswer == "x":
-    gScore += 100
-    print "BOOM! FREE LUNCH! Score = %u" % gScore
-    return
-
-  if studentAnswer == correctAnswer:
-    gScore += 100
-    print "Correct! Score = %u" % gScore
-  else:
-    gScore -= 200
-    print "Incorrect. The answer was '%s'\n Score = %u" % (correctAnswer, gScore)
+from rounds.helpers import CheckAnswerNum, CheckAnswerString
+import rounds.helpers
 
 #This function asks questions about the IMAGE_DOS_HEADER with hardcoded answers
 #thus it requires no PE file changing
 def R1Q0(questionCounter):
   Qs = ["What is the IMAGE_DOS_HEADER.e_magic in ASCII? ",
-	"What is the IMAGE_DOS_HEADER.e_magic in hex, in the file ordering? "]
+	"What is the IMAGE_DOS_HEADER.e_magic, in the file ordering? "]
 
   #Print the question
   q = random.randint(0,1)
@@ -93,15 +41,13 @@ def R1Q0(questionCounter):
 
 #This function deals with questions about IMAGE_DOS_HEADER.e_lfanew
 def R1Q1(questionCounter):
-  Qs = ["How far into the binary is the IMAGE_NT_HEADERS structure? (in hex) ",
-        "How far into the binary is the structure with the 'PE' signature? (in hex) ",
-        "What is the IMAGE_DOS_HEADER.e_lfanew in hex? ",
-        "What is the offset from the end of the IMAGE_DOS_HEADER to the IMAGE_NT_HEADERS? (in hex) "]
+  Qs = ["How far into the binary is the IMAGE_NT_HEADERS structure? ",
+        "How far into the binary is the structure with the 'PE' signature? ",
+        "What is the IMAGE_DOS_HEADER.e_lfanew? ",
+        "What is the offset from the end of the IMAGE_DOS_HEADER to the IMAGE_NT_HEADERS? "]
 
   #Open the binary and manipulate IMAGE_DOS_HEADER.e_lfanew
-#  pe = pefile.PE('template64.exe')
-  pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template64.exe')
-  
+  pe = pefile.PE('template64.exe')  
 
   outFileName = "Round1Q" + str(questionCounter) + ".exe"
 
@@ -129,13 +75,12 @@ def R1Q1(questionCounter):
 
 #This function deals with questions about FILE_HEADER.TimeDateStamp
 def R1Q2(questionCounter):
-  Qs = ["What year (in decimal) was this binary compiled according to the TimeDateStamp?",
-        "What is the IMAGE_FILE_HEADER's TimeDateStamp in hex? ",
-        "How many years old is this binary? (in decimal, round down) "]
+  Qs = ["What year, IN DECIMAL, was this binary compiled according to the TimeDateStamp?",
+        "What is the IMAGE_FILE_HEADER's TimeDateStamp? ",
+        "How many years old is this binary? (IN DECIMAL, round down) "]
 
   #Open the binary and manipulate FILE_HEADER.TimeDateStamp
-#  pe = pefile.PE('template64.exe')
-  pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template64.exe')
+  pe = pefile.PE('template64.exe')
 
   #pick the random question
   q = random.randint(0,2)
@@ -176,26 +121,23 @@ def R1Q2(questionCounter):
 def R1Q3(questionCounter):
   Qs = ["Is this a 32 bit or 64 bit binary? (enter 32 or 64) ",
         "Is this a PE32 or PE32+ binary? (enter PE32 or PE32+) ",
-	      "What is the IMAGE_FILE_HEADER.Machine field in hex? ",
-        "What IMAGE_FILE_HEADER.Machine value (in hex) indicates a 64 bit binary? ",
-        "What IMAGE_FILE_HEADER.Machine value (in hex) indicates a 32 bit binary? "]
+	      "What is the IMAGE_FILE_HEADER.Machine field? ",
+        "What IMAGE_FILE_HEADER.Machine value indicates a 64 bit binary? ",
+        "What IMAGE_FILE_HEADER.Machine value indicates a 32 bit binary? "]
 
   #pick the random question
   q = random.randint(0,4)
 
-  currentTime = int(time())
   #For simplicity, rather than trying to go through the rigamarole of
   #changing the optional header, we just randomly pick whether we open
   #a 32 or 64 bit template 
   x = random.randint(0,1)
   if x == 0:
-#    pe = pefile.PE('template32.exe')
-    pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template32.exe')
+    pe = pefile.PE('template32.exe')
     binType = 32
     binTypeStr = "PE"
   else:
-#    pe = pefile.PE('template64.exe')
-    pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template64.exe')
+    pe = pefile.PE('template64.exe')
     binType = 64
     binTypeStr = "PE+"
 
@@ -224,8 +166,8 @@ def R1Q3(questionCounter):
 #This function deals with questions about FILE_HEADER.NumberOfSections
 #But in order to randomize that, it can insert random sections
 def R1Q4(questionCounter):
-  Qs = ["How many sections does this binary have? (in decimal) ",
-        "What is the IMAGE_FILE_HEADER.NumberOfSections field? (in decimal) ",
+  Qs = ["How many sections does this binary have? (IN DECIMAL) ",
+        "What is the IMAGE_FILE_HEADER.NumberOfSections field? (IN DECIMAL) ",
         "Does this binary have %u sections? (enter Y or N) "]
 
   #to point out that section names don't have to start with a .
@@ -243,8 +185,7 @@ def R1Q4(questionCounter):
   correctNumSections = random.randint(0,1)
   #print "correctNumSections = %u" % correctNumSections
 
-#  pe = pefile.PE("./template64.exe")
-  pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template32.exe')
+  pe = pefile.PE("./template64.exe")
     
   #write out the modified file
   outFileName = "Round1Q" + str(questionCounter) + ".exe"
@@ -292,8 +233,8 @@ def R1Q5(questionCounter):
         "Is the IMAGE_FILE_LARGE_ADDRESS_AWARE file header characteristic set? (Y or N) ",
         "Does this file support being loaded at an address > 2GB? (Y or N) ",
         "Is the IMAGE_FILE_32BIT_MACHINE file header characteristic set? (Y or N) ",
-        "What is the IMAGE_FILE_HEADER.Characteristics field in hex? ",
-        "How many characteristics are set in this file's file header? "]#,
+        "What is the IMAGE_FILE_HEADER.Characteristics field? ",
+        "How many characteristics are set in this file's file header? (IN DECIMAL)"]#,
 #        "According to the file header, is this a 32 or 64 bit binary? (32 or 64) "#Not a good question because it can be set on 64 bit executables just fine
 #        "Is this file a .exe/.sys or .dll? (enter exe, sys, or dll) ",#lazy, don't want to deal with the response
 #        "Is this file an executable or dynamic library? (enter \"executable\" or \"library\") "]#lazy, don't want to deal with the response
@@ -312,29 +253,25 @@ def R1Q5(questionCounter):
   #a 32 or 64 bit template 
   x = random.randint(0,3)
   if x == 0:
-#    pe = pefile.PE('template32.exe')
-    pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template32.exe')
+    pe = pefile.PE('template32.exe')
     binBits = 32
     binTypeStr = "PE"
     isExe = "Y"
     isDll = "N"
   elif x == 1:
-#    pe = pefile.PE('template64.exe')
-    pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template64.exe')
+    pe = pefile.PE('template64.exe')
     binBits = 64
     binTypeStr = "PE+"
     isExe = "Y"
     isDll = "N"
   elif x == 2:
-#    pe = pefile.PE('template32.dll')
-    pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template32.dll')
+    pe = pefile.PE('template32.dll')
     binBits = 32
     binTypeStr = "PE"
     isExe = "N"
     isDll = "Y"
   else:
-#    pe = pefile.PE('template64.dll')
-    pe = pefile.PE('/Users/xeno/Documents/Classes/Games/roxor-arcade/BinaryScavengerHunt/pythondemo/template64.dll')
+    pe = pefile.PE('template64.dll')
     binBits = 64
     binTypeStr = "PE+"
     isExe = "N"
@@ -344,16 +281,14 @@ def R1Q5(questionCounter):
   if isDll:
     numFlagsSet += 1
   #decide whether to twiddle the bits
-  x = random.randint(0,1)
-  if x == 1:
+  if random.randint(0,1) == 1:
     pe.FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE = True
     isLargeAware = "Y"
     numFlagsSet += 1
   else:
     pe.FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE = False
     isLargeAware = "N"
-  x = random.randint(0,1)
-  if x == 1:
+  if random.randint(0,1) == 1:
     pe.FILE_HEADER.IMAGE_FILE_32BIT_MACHINE = True
     is32Characteristics = "Y"
     numFlagsSet += 1
@@ -386,18 +321,16 @@ def R1Q5(questionCounter):
   elif q == 8:
     CheckAnswerNum(answer, 10, numFlagsSet)
 
-def Round1(seed):
+def StartR1(seed):
   global gScore
   global gNextLevelRequiredScore
-
+  print "All answers should be given *in hexidecimal* unless otherwise noted."
   startTime = int(time())
-  gNextLevelRequiredScore = 1000
+  rounds.helpers.gNextLevelRequiredScore = 1000
   random.seed(seed)
   questionCounter = 0;
-  while gScore < gNextLevelRequiredScore:
+  while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
     q = random.randint(0,5)
-    #print "Round rand = %u" % q
-
     {0:R1Q0,
      1:R1Q1,
      2:R1Q2,
@@ -406,7 +339,8 @@ def Round1(seed):
      5:R1Q5}[q](questionCounter)
     questionCounter+=1
 
-  totalTime = int(time()) - startTime
-  totalMinutes = totalTime / 3600
-  totalSeconds = totalTime % 3600
-  print "\nCongratulations, you passed round 1! (in %u minutes, %u seconds)\n" % (totalMinutes, totalSeconds)
+  roundTime = int(time()) - startTime
+  roundMinutes = roundTime / 3600
+  roundSeconds = roundTime % 3600
+  rounds.helpers.gTotalElapsedTime = roundTime
+  print "\nCongratulations, you passed round 1! (in %u minutes, %u seconds)\n" % (roundMinutes, roundSeconds)

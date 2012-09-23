@@ -15,13 +15,7 @@ import os
 import random
 import pefile
 from time import time
-from rounds.Round1 import Round1 
-from rounds.Round2 import Round2 
-
-#player's current score
-gScore = 0  
-gNextLevelRequiredScore = 0
-
+from rounds import *
 
 #############################
 #MAIN CODE STARTS HERE
@@ -44,8 +38,52 @@ if mode == "0" or seed == "0":
 	seed = int(time())
 	print "Time-based seed = %u" % (seed)
 
-Round1(seed)
+Round1.StartR1(seed)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round2(seed)
+Round2.StartR2(seed)
+#TODO:I want it to be that you get a few questions from previous rounds 
+#after you're done with the new questions
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round3.StartR3(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round4.StartR4(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round5.StartR5(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round6.StartR6(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round7.StartR7(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round8.StartR8(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round9.StartR9(seed)
+if mode == "1":
+  print "WAIT for your instructor to tell you the seed.\n"
+  seed = raw_input("Enter the seed: ")
+Round10.StartR10(seed)
+#Only now enter the bonus round if the user has got 100 in a row correct
+if helpers.gWinningStreak >= 100:
+  if mode == "1":
+    print "WAIT for your instructor to tell you the seed.\n"
+    seed = raw_input("Enter the seed: ")
+  RoundX.StartRX(seed)
+else:
+  print "Congratulations on completing the game!"
+  print "You should try the game again, and if you get 100 questions"
+  print "in a row correct, you will unlock the bonus Round X :D"
