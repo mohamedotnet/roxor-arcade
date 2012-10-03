@@ -22,7 +22,7 @@ gNextLevelRequiredScore = 0
 gWinningStreak = 0
 gTotalElapsedTime = 0
 
-def CheckAnswerNum(studentAnswer, answerRadix, correctAnswer):
+def CheckAnswerNum(studentAnswer, correctAnswer):
   global gScore
   global gNextLevelRequiredScore
   global gWinningStreak
@@ -41,17 +41,29 @@ def CheckAnswerNum(studentAnswer, answerRadix, correctAnswer):
     print "BOOM! FREE LUNCH! Score = %u" % gScore
     return
 
-  if int(studentAnswer,answerRadix) == int(correctAnswer):
-    gScore += 100
-    print "Correct! Score = %u" % gScore
-    gWinningStreak += 1
-  else:
-    gScore -= 200
-    gWinningStreak = 0
-    if answerRadix == 16:
-      print "Incorrect. The answer was %x\n Score = %u" % (correctAnswer, gScore)
-    elif answerRadix == 10:
-      print "Incorrect. The answer was %u\n Score = %u" % (correctAnswer, gScore)
+  try:
+    if int(studentAnswer,16) == int(correctAnswer):
+      gScore += 100
+      print "Correct! Score = %u" % gScore
+      gWinningStreak += 1
+      return
+  except ValueError:
+    #silently continue
+    pass
+
+  try:
+    if int(studentAnswer,10) == int(correctAnswer):
+      gScore += 100
+      print "Correct! Score = %u" % gScore
+      gWinningStreak += 1
+      return
+  except ValueError:
+    #silently continue
+    pass
+
+  gScore -= 200
+  gWinningStreak = 0
+  print "Incorrect. The answer was 0x%x (decimal %u)\n Score = %u" % (correctAnswer, correctAnswer, gScore)
 
 def CheckAnswerString(studentAnswer, correctAnswer):
   global gScore
@@ -70,7 +82,7 @@ def CheckAnswerString(studentAnswer, correctAnswer):
     print "BOOM! FREE LUNCH! Score = %u" % gScore
     return
 
-  if studentAnswer == correctAnswer:
+  if studentAnswer.lower() == correctAnswer.lower():
     gScore += 100
     gWinningStreak += 1
     print "Correct! Score = %u" % gScore
@@ -78,3 +90,27 @@ def CheckAnswerString(studentAnswer, correctAnswer):
     gScore -= 200
     gWinningStreak = 0
     print "Incorrect. The answer was '%s'\n Score = %u" % (correctAnswer, gScore)
+
+#Randomizes the existing section names, but doesn't add new sections for instance
+def RandomizeSectionNames(pe):
+  pickedIndices = []
+  randomSectionNames = [".xeno", "xeno", ".kovah", "kovah", 
+                        ".chunky", ".junky", ".funky", ".punky", ".spunky", ".skunky", ".monkey",
+                        ".fee", ".fi", ".fo", ".fum",
+                        ".t3x7", ".d474", ".rDaT4",".r310c",".p4g3", ".1337",
+                        ".spam",".tram",".glam",".wham",".blam",".slam",".tram",".fam",".jam",".cam",".ma'am",
+                         "she", "sells", "seashells", "by_the", "seashore",
+                         "<-ereht", "<-si", "<-on", "<-noops",
+                         ".domo",".arigato", ".mister", ".roboto"]
+  
+  #We want a new name for each section
+  for section in pe.sections:
+    #and we're going to keep trying until we find one
+    x = random.randint(0,len(randomSectionNames)-1)
+    #But make sure we don't pick the same name twice.
+    #While it's possible to have two sections with the same name, that would
+    #lead to ambiguous answers in this case
+    while x in pickedIndices:
+      x = random.randint(0,len(randomSectionNames)-1)
+    pickedIndices.append(x)
+    section.Name = randomSectionNames[x]

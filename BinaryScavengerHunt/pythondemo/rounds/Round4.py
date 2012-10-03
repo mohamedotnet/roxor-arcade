@@ -21,11 +21,15 @@ from time import time
 from rounds.helpers import CheckAnswerNum, CheckAnswerString
 import rounds.helpers
 
-def StartR4(seed):
+#TODO: find a way to randomize
+#"In which section can the IAT be found?: "
+#"In which section can the IMPORT_DIRECTORY be found?: "
+
+def StartR4(seed, suppressRoundBanner, escapeScore):
   global gScore
   global gNextLevelRequiredScore
 
-  gNextLevelRequiredScore = 3000
+  gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   print "I'm just a placeholder! :D"
 

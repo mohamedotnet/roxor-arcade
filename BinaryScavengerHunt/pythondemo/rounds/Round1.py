@@ -25,26 +25,27 @@ import rounds.helpers
 #This function asks questions about the IMAGE_DOS_HEADER with hardcoded answers
 #thus it requires no PE file changing
 def R1Q0(questionCounter):
-  Qs = ["What is the IMAGE_DOS_HEADER.e_magic in ASCII? ",
-	"What is the IMAGE_DOS_HEADER.e_magic, in the file ordering? "]
+  Qs = ["What is the IMAGE_DOS_HEADER.e_magic in ASCII?",
+	"What is the IMAGE_DOS_HEADER.e_magic in hex, in the file ordering?"]
 
   #Print the question
-  q = random.randint(0,1)
+  q = random.randint(0,len(Qs)-1)
 
-  answer = raw_input(Qs[q])
+  print Qs[q]
+  answer = raw_input("Answer: ")
 
   if q == 0:
     CheckAnswerString(answer,"MZ")
   else:
-    CheckAnswerNum(answer,16,0x5A4D)
+    CheckAnswerNum(answer,0x5A4D)
 
 
 #This function deals with questions about IMAGE_DOS_HEADER.e_lfanew
 def R1Q1(questionCounter):
-  Qs = ["How far into the binary is the IMAGE_NT_HEADERS structure? ",
-        "How far into the binary is the structure with the 'PE' signature? ",
-        "What is the IMAGE_DOS_HEADER.e_lfanew? ",
-        "What is the offset from the end of the IMAGE_DOS_HEADER to the IMAGE_NT_HEADERS? "]
+  Qs = ["How far into the binary is the IMAGE_NT_HEADERS structure?",
+        "How far into the binary is the structure with the 'PE' signature?",
+        "What is the IMAGE_DOS_HEADER.e_lfanew?",
+        "What is the offset from the end of the IMAGE_DOS_HEADER to the IMAGE_NT_HEADERS?"]
 
   #Open the binary and manipulate IMAGE_DOS_HEADER.e_lfanew
   pe = pefile.PE('template64.exe')  
@@ -59,31 +60,32 @@ def R1Q1(questionCounter):
   pe.randomize_NT_HEADER_location(bytelist, pe.DOS_HEADER.e_lfanew, outFileName)
 
   #Print the question
-  q = random.randint(0,3)
+  q = random.randint(0,len(Qs)-1)
 
   print "For binary %s..." % outFileName
-  answer = raw_input(Qs[q])
+  print Qs[q]
+  answer = raw_input("Answer: ")
 
   #Check the answer
   if q == 3:
     #When it's question [3] we're actually looking for a difference from the end
     #of the DOS header not just from the beginning of the file
-    CheckAnswerNum(answer,16,(pe.DOS_HEADER.e_lfanew - list(pe.DOS_HEADER.__pack__()).__len__()))
+    CheckAnswerNum(answer,(pe.DOS_HEADER.e_lfanew - list(pe.DOS_HEADER.__pack__()).__len__()))
   else:
-    CheckAnswerNum(answer,16,pe.DOS_HEADER.e_lfanew)
+    CheckAnswerNum(answer,pe.DOS_HEADER.e_lfanew)
 
 
 #This function deals with questions about FILE_HEADER.TimeDateStamp
 def R1Q2(questionCounter):
   Qs = ["What year, IN DECIMAL, was this binary compiled according to the TimeDateStamp?",
-        "What is the IMAGE_FILE_HEADER's TimeDateStamp? ",
-        "How many years old is this binary? (IN DECIMAL, round down) "]
+        "What is the IMAGE_FILE_HEADER's TimeDateStamp?",
+        "How many years old is this binary? (round down)"]
 
   #Open the binary and manipulate FILE_HEADER.TimeDateStamp
   pe = pefile.PE('template64.exe')
 
   #pick the random question
-  q = random.randint(0,2)
+  q = random.randint(0,len(Qs)-1)
 
   currentTime = int(time())
   #If we happen to get the [2]nd question, we need a binary
@@ -108,25 +110,26 @@ def R1Q2(questionCounter):
 
   #Print the question
   print "For binary %s..." % outFileName
-  answer = raw_input(Qs[q])
+  print Qs[q]
+  answer = raw_input("Answer: ")
 
   if q == 0:
-    CheckAnswerNum(answer,10,binaryYear)
+    CheckAnswerNum(answer,binaryYear)
   elif q == 1:
-    CheckAnswerNum(answer,16,pe.FILE_HEADER.TimeDateStamp)
+    CheckAnswerNum(answer,pe.FILE_HEADER.TimeDateStamp)
   elif q == 2:
-    CheckAnswerNum(answer,10,int(currentYear - binaryYear))
+    CheckAnswerNum(answer,int(currentYear - binaryYear))
 
 #This function deals with questions about FILE_HEADER.Machine
 def R1Q3(questionCounter):
-  Qs = ["Is this a 32 bit or 64 bit binary? (enter 32 or 64) ",
-        "Is this a PE32 or PE32+ binary? (enter PE32 or PE32+) ",
-	      "What is the IMAGE_FILE_HEADER.Machine field? ",
-        "What IMAGE_FILE_HEADER.Machine value indicates a 64 bit binary? ",
-        "What IMAGE_FILE_HEADER.Machine value indicates a 32 bit binary? "]
+  Qs = ["Is this a 32 bit or 64 bit binary? (enter 32 or 64)",
+        "Is this a PE32 or PE32+ binary? (enter PE32 or PE32+)",
+	      "What is the IMAGE_FILE_HEADER.Machine field?",
+        "What IMAGE_FILE_HEADER.Machine value indicates a 64 bit binary?",
+        "What IMAGE_FILE_HEADER.Machine value indicates a 32 bit binary?"]
 
   #pick the random question
-  q = random.randint(0,4)
+  q = random.randint(0,len(Qs)-1)
 
   #For simplicity, rather than trying to go through the rigamarole of
   #changing the optional header, we just randomly pick whether we open
@@ -152,23 +155,24 @@ def R1Q3(questionCounter):
 
   #Print the question
   print "For binary %s..." % outFileName
-  answer = raw_input(Qs[q])
+  print Qs[q]
+  answer = raw_input("Answer: ")
 
   if q == 0:
-    CheckAnswerNum(answer,10,binType)
+    CheckAnswerNum(answer,binType)
   elif q == 1:
     CheckAnswerString(answer,binTypeStr)
   elif q == 2 or q == 3:
-    CheckAnswerNum(answer,16,0x8664)
+    CheckAnswerNum(answer,0x8664)
   elif q == 4:
-    CheckAnswerNum(answer,16,0x014C)
+    CheckAnswerNum(answer,0x014C)
 
 #This function deals with questions about FILE_HEADER.NumberOfSections
 #But in order to randomize that, it can insert random sections
 def R1Q4(questionCounter):
-  Qs = ["How many sections does this binary have? (IN DECIMAL) ",
-        "What is the IMAGE_FILE_HEADER.NumberOfSections field? (IN DECIMAL) ",
-        "Does this binary have %u sections? (enter Y or N) "]
+  Qs = ["How many sections does this binary have? ",
+        "What is the IMAGE_FILE_HEADER.NumberOfSections field? ",
+        "Does this binary have %u sections? (Y or N) "]
 
   #to point out that section names don't have to start with a .
   #and to have easter eggs for the student who becomes the reader :P
@@ -181,7 +185,7 @@ def R1Q4(questionCounter):
                          "<-eht", "<-taehc", "<-edoc", "<-si", "<-x"]
 
   #pick the random question
-  q = random.randint(0,2)
+  q = random.randint(0,len(Qs)-1)
   correctNumSections = random.randint(0,1)
   #print "correctNumSections = %u" % correctNumSections
 
@@ -217,10 +221,11 @@ def R1Q4(questionCounter):
   pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, outFileName)
 
   #ask question
-  answer = raw_input(tmp)
+  print Qs[q]
+  answer = raw_input("Answer: ")
 
   if q == 0 or q == 1:
-    CheckAnswerNum(answer,10,pe.FILE_HEADER.NumberOfSections)
+    CheckAnswerNum(answer,pe.FILE_HEADER.NumberOfSections)
   elif q == 2:
     CheckAnswerString(answer,correctStr)
 
@@ -245,7 +250,7 @@ def R1Q5(questionCounter):
   #think is useful:
 
   #pick the random question
-  q = random.randint(0,8)
+  q = random.randint(0,len(Qs)-1)
 
   currentTime = int(time())
   #For simplicity, rather than trying to go through the rigamarole of
@@ -306,7 +311,8 @@ def R1Q5(questionCounter):
 
   #Print the question
   print "For binary %s..." % outFileName
-  answer = raw_input(Qs[q])
+  print Qs[q]
+  answer = raw_input("Answer: ")
 
   if q == 0 or q == 1:
     CheckAnswerString(answer,isExe)
@@ -317,16 +323,22 @@ def R1Q5(questionCounter):
   elif q == 6:
     CheckAnswerString(answer,is32Characteristics)
   elif q == 7:
-    CheckAnswerNum(answer, 16, pe.FILE_HEADER.Characteristics)
+    CheckAnswerNum(answer, pe.FILE_HEADER.Characteristics)
   elif q == 8:
-    CheckAnswerNum(answer, 10, numFlagsSet)
+    CheckAnswerNum(answer, numFlagsSet)
 
-def StartR1(seed):
+def StartR1(seed, suppressRoundBanner, escapeScore):
   global gScore
   global gNextLevelRequiredScore
-  print "All answers should be given *in hexidecimal* unless otherwise noted."
+  if not suppressRoundBanner:
+    print "================================================================================"
+    print "Welcome to Round 1:"
+    print "This round is all about the IMAGE_DOS_HEADER (\"DOS Header\"),"
+    print "and the IMAGE_NT_HEADER.IMAGE_FILE_HEADER (\"File Header\")"
+    print "================================================================================\n"
+  
   startTime = int(time())
-  rounds.helpers.gNextLevelRequiredScore = 1000
+  rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
@@ -339,8 +351,9 @@ def StartR1(seed):
      5:R1Q5}[q](questionCounter)
     questionCounter+=1
 
-  roundTime = int(time()) - startTime
-  roundMinutes = roundTime / 3600
-  roundSeconds = roundTime % 3600
-  rounds.helpers.gTotalElapsedTime = roundTime
-  print "\nCongratulations, you passed round 1! (in %u minutes, %u seconds)\n" % (roundMinutes, roundSeconds)
+  if not suppressRoundBanner:
+    roundTime = int(time()) - startTime
+    roundMinutes = roundTime / 3600
+    roundSeconds = roundTime % 3600
+    rounds.helpers.gTotalElapsedTime = roundTime
+    print "\nCongratulations, you passed round 1! (in %u minutes, %u seconds)\n" % (roundMinutes, roundSeconds)

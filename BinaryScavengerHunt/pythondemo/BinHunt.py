@@ -17,10 +17,35 @@ import pefile
 from time import time
 from rounds import *
 
+#This will select one question at a time randomly from rounds 1 to previousRoundCap, inclusive
+def RandomQuestionsFromPreviousRounds(seed, roundEscapeScore, previousRoundCap):
+  print "\nOh no! You've been teleported back to previous rounds!"
+  print "Show that you haven't forgotten all the old material already!\n"
+  qEscapeScore = helpers.gNextLevelRequiredScore
+  while qEscapeScore < roundEscapeScore:
+    qEscapeScore += 100
+    x = random.randint(1,previousRoundCap)
+    {1:Round1.StartR1,
+     2:Round2.StartR2,
+     3:Round3.StartR3,
+     4:Round4.StartR4,
+     5:Round5.StartR5,
+     6:Round6.StartR6,
+     7:Round7.StartR7,
+     8:Round8.StartR8,
+     9:Round9.StartR9,
+     10:Round10.StartR10,
+    }[x](seed+qEscapeScore, 1, qEscapeScore) #always suppressRoundBanner when called from this function
+    #seed+qEscapeScore is because if you just keep entering only seed in each iteration
+    #you will just keep re-seeding the PRNG in each round, thus getting the same
+    #choice of questions each time
+  print "\nOK, you escaped the previous rounds, time to move on!\n"
+
 #############################
 #MAIN CODE STARTS HERE
 #############################
-print "Welcome to Binary Scavenger Hunt!\n\n"
+print "Welcome to Binary Scavenger Hunt!\n"
+print "In this game you will learn about the\nPortable Executable (PE) binary format!\n\n"
 mode = raw_input("Enter 0 for single player mode or 1 for class mode: ")
 seed = "0"
 
@@ -38,51 +63,58 @@ if mode == "0" or seed == "0":
 	seed = int(time())
 	print "Time-based seed = %u" % (seed)
 
-Round1.StartR1(seed)
+Round1.StartR1(seed, 0, 1000)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round2.StartR2(seed)
-#TODO:I want it to be that you get a few questions from previous rounds 
-#after you're done with the new questions
+Round2.StartR2(seed, 0, 2000)
+RandomQuestionsFromPreviousRounds(seed, 2500, 1)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round3.StartR3(seed)
+Round3.StartR3(seed, 0, 3500)
+RandomQuestionsFromPreviousRounds(seed, 4000, 2)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round4.StartR4(seed)
+Round4.StartR4(seed, 0, 5000)
+RandomQuestionsFromPreviousRounds(seed, 5500, 3)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round5.StartR5(seed)
+Round5.StartR5(seed, 0, 6500)
+RandomQuestionsFromPreviousRounds(seed, 7000, 4)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round6.StartR6(seed)
+Round6.StartR6(seed, 0, 8000)
+RandomQuestionsFromPreviousRounds(seed, 8500, 5)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round7.StartR7(seed)
+Round7.StartR7(seed, 0, 9500)
+RandomQuestionsFromPreviousRounds(seed, 10000, 6)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round8.StartR8(seed)
+Round8.StartR8(seed, 0, 11000)
+RandomQuestionsFromPreviousRounds(seed, 11500, 7)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round9.StartR9(seed)
+Round9.StartR9(seed, 0, 12500)
+RandomQuestionsFromPreviousRounds(seed, 13000, 8)
 if mode == "1":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-Round10.StartR10(seed)
+Round10.StartR10(seed, 0, 14000)
+RandomQuestionsFromPreviousRounds(seed, 14500, 6)
 #Only now enter the bonus round if the user has got 100 in a row correct
 if helpers.gWinningStreak >= 100:
   if mode == "1":
     print "WAIT for your instructor to tell you the seed.\n"
     seed = raw_input("Enter the seed: ")
-  RoundX.StartRX(seed)
+  RoundX.StartRX(seed, 0, 25000)
 else:
   print "Congratulations on completing the game!"
   print "You should try the game again, and if you get 100 questions"

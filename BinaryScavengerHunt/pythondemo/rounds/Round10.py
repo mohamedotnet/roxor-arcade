@@ -19,16 +19,13 @@ import random
 import pefile
 from time import time
 from rounds.helpers import CheckAnswerNum, CheckAnswerString
+import rounds.helpers
 
-#player's current score
-gScore = 0
-gNextLevelRequiredScore = 0
-
-def StartR10(seed):
+def StartR10(seed, suppressRoundBanner, escapeScore):
   global gScore
   global gNextLevelRequiredScore
 
-  gNextLevelRequiredScore = 3000
+  gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   print "I'm just a placeholder! :D"
 

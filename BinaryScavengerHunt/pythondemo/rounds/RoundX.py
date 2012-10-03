@@ -48,11 +48,11 @@ import rounds.helpers
 #allocations vs. the field size (but won't go with less than the sum, since that is covered
 #by the previous question
 
-def StartRX(seed):
+def StartRX(seed, suppressRoundBanner, escapeScore):
   global gScore
   global gNextLevelRequiredScore
 
-  gNextLevelRequiredScore = 3000
+  gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   print "I'm just a placeholder! :D"
 

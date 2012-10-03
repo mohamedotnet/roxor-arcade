@@ -48,7 +48,7 @@ def R2Q0(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  q = random.randint(0,4)
+  q = random.randint(0,len(Qs)-1)
 #  if q == 0:
 #    print "answer = %x" % pe.OPTIONAL_HEADER.Magic
 #  elif q == 1:
@@ -64,13 +64,13 @@ def R2Q0(questionCounter):
   answer = raw_input(Qs[q])
 
   if q == 0:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.Magic) 
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.Magic) 
   elif q == 1:
-    CheckAnswerNum(answer,16,0x010B) 
+    CheckAnswerNum(answer,0x010B) 
   elif q == 2:
     CheckAnswerString(answer,is32)
   elif q == 3:
-    CheckAnswerNum(answer,16,0x020B)  
+    CheckAnswerNum(answer,0x020B)  
   elif q == 4:
     CheckAnswerString(answer,is64)
 
@@ -92,7 +92,7 @@ def R2Q1(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  q = random.randint(0,2)
+  q = random.randint(0,len(Qs)-1)
 #  if q == 0 or q == 1:
 #    print "answer = %x" % pe.OPTIONAL_HEADER.AddressOfEntryPoint
 #  elif q == 2:
@@ -101,9 +101,9 @@ def R2Q1(questionCounter):
   answer = raw_input(Qs[q])
 
   if q == 0 or q == 1:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.AddressOfEntryPoint) 
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.AddressOfEntryPoint) 
   elif q == 2:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.AddressOfEntryPoint + pe.OPTIONAL_HEADER.ImageBase) 
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.AddressOfEntryPoint + pe.OPTIONAL_HEADER.ImageBase) 
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.ImageBase
 def R2Q2(questionCounter):
@@ -124,13 +124,13 @@ def R2Q2(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  q = random.randint(0,1)
+  q = random.randint(0,len(Qs)-1)
 #  print "answer = %x" % pe.OPTIONAL_HEADER.ImageBase
   print "For binary %s..." % outFileName
   answer = raw_input(Qs[q])
 
   if q == 0 or q == 1:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.ImageBase) 
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.ImageBase) 
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.SizeOfImage
 def R2Q3(questionCounter):
@@ -161,13 +161,13 @@ def R2Q3(questionCounter):
   pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, outFileName)
 
   #Print the question
-  q = random.randint(0,1)
+  q = random.randint(0,len(Qs)-1)
 #  print "answer = %x" % pe.OPTIONAL_HEADER.SizeOfImage
   print "For binary %s..." % outFileName
   answer = raw_input(Qs[q])
 
   if q == 0 or q == 1:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.SizeOfImage)
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.SizeOfImage)
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.SectionAlignment & FileAlignment
 def R2Q4(questionCounter):
@@ -188,7 +188,7 @@ def R2Q4(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  q = random.randint(0,3)
+  q = random.randint(0,len(Qs)-1)
 #  if q == 0 or q == 1:
 #    print "answer = %x" % pe.OPTIONAL_HEADER.FileAlignment
 #  if q == 2 or q == 3:
@@ -197,9 +197,9 @@ def R2Q4(questionCounter):
   answer = raw_input(Qs[q])
 
   if q == 0 or q == 1:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.FileAlignment)
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.FileAlignment)
   if q == 2 or q == 3:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.SectionAlignment)
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.SectionAlignment)
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.DllCharacteristics flags
 def R2Q5(questionCounter):
@@ -267,14 +267,14 @@ def R2Q5(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  q = random.randint(0,10)
+  q = random.randint(0,len(Qs)-1)
 #  print "characteristics = %x" % pe.OPTIONAL_HEADER.DllCharacteristics
 #  print "numFlagsSet = %u" % numFlagsSet
   print "For binary %s..." % outFileName
   answer = raw_input(Qs[q])
 
   if q == 0:
-    CheckAnswerNum(answer,16,pe.OPTIONAL_HEADER.DllCharacteristics)
+    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.DllCharacteristics)
   elif q == 1 or q == 2:
     CheckAnswerString(answer,aslrCompat)
   elif q == 3 or q == 4 or q == 5:
@@ -284,17 +284,21 @@ def R2Q5(questionCounter):
   elif q == 8 or q == 9:
     CheckAnswerString(answer,termSrv)
   elif q == 10:
-    CheckAnswerNum(answer,16,numFlagsSet)
+    CheckAnswerNum(answer,numFlagsSet)
 
-def StartR2(seed):
+def StartR2(seed, suppressRoundBanner, escapeScore):
   global gScore
   global gNextLevelRequiredScore
-  print "All answers should be given *in hexidecimal* unless otherwise noted."
-  print "Round terminology note:"
-  print "RVA = Relative Virtual Address (relative to image base)."
-  print "AVA = Absolute Virtual Address (base + RVA)"
+  if not suppressRoundBanner:
+    print "================================================================================"
+    print "Welcome to Round 2:"
+    print "This round is about IMAGE_NT_HEADER.IMAGE_OPTIONAL_HEADER (\"Optional Header\")"
+    print "\nRound terminology note:"
+    print "RVA = Relative Virtual Address (relative to image base)."
+    print "AVA = Absolute Virtual Address (base + RVA)"
+    print "================================================================================\n"
   startTime = int(time())
-  rounds.helpers.gNextLevelRequiredScore = 2000
+  rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
@@ -310,12 +314,13 @@ def StartR2(seed):
      }[q](questionCounter)
     questionCounter+=1
 
-  roundTime = int(time()) - startTime
-  roundMinutes = roundTime / 3600
-  roundSeconds = roundTime % 3600
-  rounds.helpers.gTotalElapsedTime += roundTime
-  print "\nCongratulations, you passed round 2!"
-  print "It took you %u minutes, %u seconds for this round." % (roundMinutes, roundSeconds)
-  totalMinutes = rounds.helpers.gTotalElapsedTime / 3600
-  totalSeconds = rounds.helpers.gTotalElapsedTime % 3600
-  print "And so far it's taken you a total time of %u minutes, %u seconds." % (totalMinutes, totalSeconds) 
+  if not suppressRoundBanner:
+    roundTime = int(time()) - startTime
+    roundMinutes = roundTime / 3600
+    roundSeconds = roundTime % 3600
+    rounds.helpers.gTotalElapsedTime += roundTime
+    print "\nCongratulations, you passed round 2!"
+    print "It took you %u minutes, %u seconds for this round." % (roundMinutes, roundSeconds)
+    totalMinutes = rounds.helpers.gTotalElapsedTime / 3600
+    totalSeconds = rounds.helpers.gTotalElapsedTime % 3600
+    print "And so far it's taken you a total time of %u minutes, %u seconds." % (totalMinutes, totalSeconds) 
