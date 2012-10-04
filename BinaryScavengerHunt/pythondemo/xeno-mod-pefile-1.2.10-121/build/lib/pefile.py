@@ -2190,7 +2190,9 @@ class PE:
 ############################################################ (it's so I can see where my functions break better :P)
 
     #This should be used to make a generic insert_bytes later
-    def modifySectionsAndWrite(self, totalNumSections, randomSectionNames, filename=None):
+    #The reason we have the updateSizeOfImage as a conditional option, is so that we can reuse
+    #this function for questions in round 2 and 3
+    def modifySectionsAndWrite(self, totalNumSections, randomSectionNames, updateSizeOfImage, filename=None):
         """Insert arbitrary file data and update structure offsets.
 
         This function will add random section headers after the 
@@ -2233,7 +2235,8 @@ class PE:
         #As I found out the hard way, it really doesn't like it if you don't update
         #the OPTIONAL_HEADER.SizeOfImage (Windows doesn't seem to care about the SizeOfHeaders
         #but I will update that anyway)
-        self.OPTIONAL_HEADER.SizeOfImage += numSectToAdd*0x1000
+        if updateSizeOfImage:
+          self.OPTIONAL_HEADER.SizeOfImage += numSectToAdd*0x1000
         self.OPTIONAL_HEADER.SizeOfHeaders += totalSizeOfNewSectHdrs
         
         #Now create a holder section which will be reused

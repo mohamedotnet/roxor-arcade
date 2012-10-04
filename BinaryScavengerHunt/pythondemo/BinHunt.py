@@ -46,73 +46,76 @@ def RandomQuestionsFromPreviousRounds(seed, roundEscapeScore, previousRoundCap):
 #############################
 print "Welcome to Binary Scavenger Hunt!\n"
 print "In this game you will learn about the\nPortable Executable (PE) binary format!\n\n"
-mode = raw_input("Enter 0 for single player mode or 1 for class mode: ")
+mode = raw_input("Enter 0 for single player mode.\nEnter 1 for single player replay (specify the seed of a previous play).\nEnter 2 for class mode.\nMode: ")
 seed = "0"
 
-if mode == "1":
+if mode == "2":
   print "You will be asked for a 'seed'. This is just a number that affects"
   print "the way the internal random number generator works."
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
+elif mode == "1":
+  seed = int(raw_input("Enter the starting seed from your previous play: "))
 else:
-  mode = "0"
+  #Default to single player mode if there is invalid input
+  #Get the current time (it will be a float before we use int()) 
+  #to use as a seed if they don't want to specify one 
+  seed = int(time())
+  print "Time-based seed = %u" % (seed)
 
-if mode == "0" or seed == "0":
-	#Get the current time (it will be a float before we use int()) 
-	#to use as a seed if they don't want to specify one 
-	seed = int(time())
-	print "Time-based seed = %u" % (seed)
+helpers.gStartingSeed = seed
 
 Round1.StartR1(seed, 0, 1000)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round2.StartR2(seed, 0, 2000)
 RandomQuestionsFromPreviousRounds(seed, 2500, 1)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round3.StartR3(seed, 0, 3500)
 RandomQuestionsFromPreviousRounds(seed, 4000, 2)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round4.StartR4(seed, 0, 5000)
 RandomQuestionsFromPreviousRounds(seed, 5500, 3)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round5.StartR5(seed, 0, 6500)
 RandomQuestionsFromPreviousRounds(seed, 7000, 4)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round6.StartR6(seed, 0, 8000)
 RandomQuestionsFromPreviousRounds(seed, 8500, 5)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round7.StartR7(seed, 0, 9500)
 RandomQuestionsFromPreviousRounds(seed, 10000, 6)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round8.StartR8(seed, 0, 11000)
 RandomQuestionsFromPreviousRounds(seed, 11500, 7)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round9.StartR9(seed, 0, 12500)
 RandomQuestionsFromPreviousRounds(seed, 13000, 8)
-if mode == "1":
+if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
 Round10.StartR10(seed, 0, 14000)
-RandomQuestionsFromPreviousRounds(seed, 14500, 6)
+RandomQuestionsFromPreviousRounds(seed, 16500, 10)#ask more questions from all rounds 
 #Only now enter the bonus round if the user has got 100 in a row correct
 if helpers.gWinningStreak >= 100:
-  if mode == "1":
-    print "WAIT for your instructor to tell you the seed.\n"
+  print "Congratulations, you have made it to the mysterious Round X!"
+  if mode == "2":
+    print "But still WAIT for your instructor to tell you the seed ;)\n"
     seed = raw_input("Enter the seed: ")
   RoundX.StartRX(seed, 0, 25000)
 else:

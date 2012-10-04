@@ -26,7 +26,7 @@ import rounds.helpers
 #thus it requires no PE file changing
 def R1Q0(questionCounter):
   Qs = ["What is the IMAGE_DOS_HEADER.e_magic in ASCII?",
-	"What is the IMAGE_DOS_HEADER.e_magic in hex, in the file ordering?"]
+	"What is the numeric value of the IMAGE_DOS_HEADER.e_magic?"]
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -48,7 +48,15 @@ def R1Q1(questionCounter):
         "What is the offset from the end of the IMAGE_DOS_HEADER to the IMAGE_NT_HEADERS?"]
 
   #Open the binary and manipulate IMAGE_DOS_HEADER.e_lfanew
-  pe = pefile.PE('template64.exe')  
+  x = random.randint(0,3)
+  if x == 0:
+    pe = pefile.PE('../template32.exe')
+  elif x == 1:
+    pe = pefile.PE('../template64.exe')
+  elif x == 2:
+    pe = pefile.PE('../template32.dll')
+  else:
+    pe = pefile.PE('../template64.dll')
 
   outFileName = "Round1Q" + str(questionCounter) + ".exe"
 
@@ -62,7 +70,7 @@ def R1Q1(questionCounter):
   #Print the question
   q = random.randint(0,len(Qs)-1)
 
-  print "For binary %s..." % outFileName
+  print "For binary R1Bins/%s..." % outFileName
   print Qs[q]
   answer = raw_input("Answer: ")
 
@@ -77,12 +85,20 @@ def R1Q1(questionCounter):
 
 #This function deals with questions about FILE_HEADER.TimeDateStamp
 def R1Q2(questionCounter):
-  Qs = ["What year, IN DECIMAL, was this binary compiled according to the TimeDateStamp?",
+  Qs = ["What year was this binary compiled according to the TimeDateStamp?",
         "What is the IMAGE_FILE_HEADER's TimeDateStamp?",
         "How many years old is this binary? (round down)"]
 
   #Open the binary and manipulate FILE_HEADER.TimeDateStamp
-  pe = pefile.PE('template64.exe')
+  x = random.randint(0,3)
+  if x == 0:
+    pe = pefile.PE('../template32.exe')
+  elif x == 1:
+    pe = pefile.PE('../template64.exe')
+  elif x == 2:
+    pe = pefile.PE('../template32.dll')
+  else:
+    pe = pefile.PE('../template64.dll')
 
   #pick the random question
   q = random.randint(0,len(Qs)-1)
@@ -109,7 +125,7 @@ def R1Q2(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  print "For binary %s..." % outFileName
+  print "For binary R1Bins/%s..." % outFileName
   print Qs[q]
   answer = raw_input("Answer: ")
 
@@ -135,15 +151,20 @@ def R1Q3(questionCounter):
   #changing the optional header, we just randomly pick whether we open
   #a 32 or 64 bit template 
   x = random.randint(0,1)
-  if x == 0:
-    pe = pefile.PE('template32.exe')
+  if x:
+    if random.randint(0,1):
+      pe = pefile.PE('../template32.exe')
+    else:
+      pe = pefile.PE('../template32.dll')
     binType = 32
     binTypeStr = "PE"
   else:
-    pe = pefile.PE('template64.exe')
+    if random.randint(0,1):
+      pe = pefile.PE('../template64.exe')
+    else:
+      pe = pefile.PE('../template64.dll')
     binType = 64
     binTypeStr = "PE+"
-
   #print "selected %s binary" % binTypeStr
    
   #In the future we might want to make modifications to the template binary in every case
@@ -154,7 +175,7 @@ def R1Q3(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  print "For binary %s..." % outFileName
+  print "For binary R1Bins/%s..." % outFileName
   print Qs[q]
   answer = raw_input("Answer: ")
 
@@ -162,7 +183,12 @@ def R1Q3(questionCounter):
     CheckAnswerNum(answer,binType)
   elif q == 1:
     CheckAnswerString(answer,binTypeStr)
-  elif q == 2 or q == 3:
+  elif q == 2:
+    if binType == 32:
+      CheckAnswerNum(answer,0x014C)
+    else:
+      CheckAnswerNum(answer,0x8664)
+  elif q == 3:
     CheckAnswerNum(answer,0x8664)
   elif q == 4:
     CheckAnswerNum(answer,0x014C)
@@ -172,7 +198,7 @@ def R1Q3(questionCounter):
 def R1Q4(questionCounter):
   Qs = ["How many sections does this binary have? ",
         "What is the IMAGE_FILE_HEADER.NumberOfSections field? ",
-        "Does this binary have %u sections? (Y or N) "]
+        "Does this binary have %u sections? (Y or N)"]
 
   #to point out that section names don't have to start with a .
   #and to have easter eggs for the student who becomes the reader :P
@@ -189,7 +215,16 @@ def R1Q4(questionCounter):
   correctNumSections = random.randint(0,1)
   #print "correctNumSections = %u" % correctNumSections
 
-  pe = pefile.PE("./template64.exe")
+  x = random.randint(0,3)
+  if x == 0:
+    pe = pefile.PE('../template32.exe')
+  elif x == 1:
+    pe = pefile.PE('../template64.exe')
+  elif x == 2:
+    pe = pefile.PE('../template32.dll')
+  else:
+    pe = pefile.PE('../template64.dll')
+
     
   #write out the modified file
   outFileName = "Round1Q" + str(questionCounter) + ".exe"
@@ -204,7 +239,7 @@ def R1Q4(questionCounter):
   #section names! (5% chance overall) Easter Egg! :D
 
   #Print the question
-  print "For binary %s..." % outFileName
+  print "For binary R1Bins/%s..." % outFileName
   if q == 2:
     if correctNumSections:
       tmp = Qs[q] % totalNumSections
@@ -218,10 +253,10 @@ def R1Q4(questionCounter):
   #Since we haven't actually modified pe.FILE_HEADER.NumberOfSections in the binary yet
   #this function will know whether to add new sections based on whether the first param
   #is greater than the existing header or not
-  pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, outFileName)
+  pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, 1, outFileName)
 
   #ask question
-  print Qs[q]
+  print tmp
   answer = raw_input("Answer: ")
 
   if q == 0 or q == 1:
@@ -231,18 +266,18 @@ def R1Q4(questionCounter):
 
 #This function deals with questions about FILE_HEADER.Characteristics
 def R1Q5(questionCounter):
-  Qs = ["Is the IMAGE_FILE_EXECUTABLE_IMAGE file header characteristic set? (Y or N) ",
-        "Is this file a regular executable (.exe)? (Y or N) ",
-        "Is the IMAGE_FILE_DLL file header characteristic set? (Y or N) ",
-        "Is this file a dynamic-link library (.dll)? (Y or N) ",
-        "Is the IMAGE_FILE_LARGE_ADDRESS_AWARE file header characteristic set? (Y or N) ",
-        "Does this file support being loaded at an address > 2GB? (Y or N) ",
-        "Is the IMAGE_FILE_32BIT_MACHINE file header characteristic set? (Y or N) ",
+  Qs = ["Is the IMAGE_FILE_EXECUTABLE_IMAGE file header characteristic set? (Y or N)",
+        "Is this file a regular executable (.exe)? (Y or N)",
+        "Is the IMAGE_FILE_DLL file header characteristic set? (Y or N)",
+        "Is this file a dynamic-link library (.dll)? (Y or N)",
+        "Is the IMAGE_FILE_LARGE_ADDRESS_AWARE file header characteristic set? (Y or N)",
+        "Does this file support being loaded at an address > 2GB? (Y or N)",
+        "Is the IMAGE_FILE_32BIT_MACHINE file header characteristic set? (Y or N)",
         "What is the IMAGE_FILE_HEADER.Characteristics field? ",
-        "How many characteristics are set in this file's file header? (IN DECIMAL)"]#,
-#        "According to the file header, is this a 32 or 64 bit binary? (32 or 64) "#Not a good question because it can be set on 64 bit executables just fine
-#        "Is this file a .exe/.sys or .dll? (enter exe, sys, or dll) ",#lazy, don't want to deal with the response
-#        "Is this file an executable or dynamic library? (enter \"executable\" or \"library\") "]#lazy, don't want to deal with the response
+        "How many characteristics are set in this file's file header?"]#,
+#        "According to the file header, is this a 32 or 64 bit binary? (32 or 64)"#Not a good question because it can be set on 64 bit executables just fine
+#        "Is this file a .exe/.sys or .dll? (enter exe, sys, or dll)",#lazy, don't want to deal with the response
+#        "Is this file an executable or dynamic library? (enter \"executable\" or \"library\")"]#lazy, don't want to deal with the response
 
 
   #I am not generating any questions about other characteristics, because the
@@ -255,50 +290,49 @@ def R1Q5(questionCounter):
   currentTime = int(time())
   #For simplicity, rather than trying to go through the rigamarole of
   #changing the optional header, we just randomly pick whether we open
-  #a 32 or 64 bit template 
+  #a 32 or 64 bit template
   x = random.randint(0,3)
   if x == 0:
-    pe = pefile.PE('template32.exe')
+    pe = pefile.PE('../template32.exe')
     binBits = 32
     binTypeStr = "PE"
-    isExe = "Y"
     isDll = "N"
   elif x == 1:
-    pe = pefile.PE('template64.exe')
+    pe = pefile.PE('../template64.exe')
     binBits = 64
     binTypeStr = "PE+"
-    isExe = "Y"
     isDll = "N"
   elif x == 2:
-    pe = pefile.PE('template32.dll')
+    pe = pefile.PE('../template32.dll')
     binBits = 32
     binTypeStr = "PE"
-    isExe = "N"
     isDll = "Y"
   else:
-    pe = pefile.PE('template64.dll')
+    pe = pefile.PE('../template64.dll')
     binBits = 64
     binTypeStr = "PE+"
-    isExe = "N"
     isDll = "Y"
     
   numFlagsSet = 1
-  if isDll:
+  if isDll == "Y":
     numFlagsSet += 1
   #decide whether to twiddle the bits
+  #Found out the hard way just doing something like 
+  #"pe.FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE = True" 
+  #doesn't effect the file for these characteristics
   if random.randint(0,1) == 1:
-    pe.FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE = True
+    pe.FILE_HEADER.Characteristics |= 0x20
     isLargeAware = "Y"
     numFlagsSet += 1
   else:
-    pe.FILE_HEADER.IMAGE_FILE_LARGE_ADDRESS_AWARE = False
+    pe.FILE_HEADER.Characteristics &= ~0x20
     isLargeAware = "N"
   if random.randint(0,1) == 1:
-    pe.FILE_HEADER.IMAGE_FILE_32BIT_MACHINE = True
+    pe.FILE_HEADER.Characteristics |= 0x100
     is32Characteristics = "Y"
     numFlagsSet += 1
   else:
-    pe.FILE_HEADER.IMAGE_FILE_32BIT_MACHINE = False
+    pe.FILE_HEADER.Characteristics &= ~0x100
     is32Characteristics = "N"
     
 #  print "selected %s binary" % binTypeStr
@@ -310,12 +344,12 @@ def R1Q5(questionCounter):
   pe.write(filename=outFileName)
 
   #Print the question
-  print "For binary %s..." % outFileName
+  print "For binary R1Bins/%s..." % outFileName
   print Qs[q]
   answer = raw_input("Answer: ")
 
   if q == 0 or q == 1:
-    CheckAnswerString(answer,isExe)
+    CheckAnswerString(answer,"Y")
   elif q == 2 or q == 3:
     CheckAnswerString(answer,isDll)
   elif q == 4 or q == 5:
@@ -336,24 +370,33 @@ def StartR1(seed, suppressRoundBanner, escapeScore):
     print "This round is all about the IMAGE_DOS_HEADER (\"DOS Header\"),"
     print "and the IMAGE_NT_HEADER.IMAGE_FILE_HEADER (\"File Header\")"
     print "================================================================================\n"
-  
-  startTime = int(time())
+  #making a directory that the files go into, just to keep things tidier
+  try:
+    os.mkdir("R1Bins")
+  except OSError:
+    pass
+  os.chdir("R1Bins")
+  filelist = [ f for f in os.listdir(".")]
+  for f in filelist:
+    os.remove(f)
+  rounds.helpers.gAbsoluteStartTime = roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    q = random.randint(0,5)
+    x = random.randint(0,5)
     {0:R1Q0,
      1:R1Q1,
      2:R1Q2,
      3:R1Q3,
      4:R1Q4,
-     5:R1Q5}[q](questionCounter)
+     5:R1Q5}[x](questionCounter)
     questionCounter+=1
 
   if not suppressRoundBanner:
-    roundTime = int(time()) - startTime
+    roundTime = int(time()) - roundStartTime
     roundMinutes = roundTime / 3600
     roundSeconds = roundTime % 3600
-    rounds.helpers.gTotalElapsedTime = roundTime
     print "\nCongratulations, you passed round 1! (in %u minutes, %u seconds)\n" % (roundMinutes, roundSeconds)
+
+  os.chdir("..")
