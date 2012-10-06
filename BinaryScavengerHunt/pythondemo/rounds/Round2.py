@@ -24,11 +24,13 @@ import rounds.helpers
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.Magic
 def R2Q0(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the IMAGE_OPTIONAL_HEADER.Magic value?",
   "What value of the optional header 'Magic' field indicates a 32 bit (PE32) binary?",
   "According to the IMAGE_OPTIONAL_HEADER.Magic, is this a 32 bit (PE32) binary? (Y or N)",
   "What value of the optional header 'Magic' field indicates a 64 bit (PE32+) binary?",
   "According to the IMAGE_OPTIONAL_HEADER.Magic, is this a 64 bit (PE32+) binary? (Y or N)"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   #For simplicity, rather than trying to go through the rigamarole of
   #changing the optional header, we just randomly pick whether we open
@@ -83,9 +85,11 @@ def R2Q0(questionCounter):
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.AddressOfEntryPoint
 def R2Q1(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.AddressOfEntryPoint?",
   "What is the RVA of the first code which executes in this binary?",
   "What is the AVA of the first code which executes in this binary?"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
   if x == 0:
@@ -121,8 +125,10 @@ def R2Q1(questionCounter):
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.ImageBase
 def R2Q2(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.ImageBase?",
   "What is the preferred AVA this binary would like to be loaded into memory at?"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
   if x == 0:
@@ -154,8 +160,10 @@ def R2Q2(questionCounter):
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.SizeOfImage
 def R2Q3(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.SizeOfImage?",
   "What is the total amount of memory this binary will reserve in memory?"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   #Just reusing the capability from R1Q4
   randomSectionNames = [".xeno", "xeno", ".kovah", "kovah", 
@@ -198,10 +206,12 @@ def R2Q3(questionCounter):
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.SectionAlignment & FileAlignment
 def R2Q4(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.FileAlignment?",
   "What are the alignment sizes needed to align section data in the file?",
   "What is the value of IMAGE_OPTIONAL_HEADER.SectionAlignment?",
   "What are the alignment sizes needed to align section information in memory?",]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
   if x == 0:
@@ -237,6 +247,7 @@ def R2Q4(questionCounter):
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.DllCharacteristics flags
 def R2Q5(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.DLLCharacteristics?",
   "Is IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE set? (Y or N)",
   "Does this binary support ASLR? (Y or N)",
@@ -253,6 +264,7 @@ def R2Q5(questionCounter):
 #  "Is IMAGE_DLLCHARACTERISTICS_NO_ISOLATION set? (Y or N)",
 #  "Is IMAGE_DLLCHARACTERISTICS_NO_BIND set? (Y or N)",
 #  "Is IMAGE_DLLCHARACTERISTICS_WDM_DRIVER set? (Y or N)",
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
   if x == 0:
@@ -351,14 +363,23 @@ def StartR2(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    x = random.randint(0,5)
-    {0:R2Q0,
-     1:R2Q1,
-     2:R2Q2,
-     3:R2Q3,
-     4:R2Q4,
-     5:R2Q5
-     }[x](questionCounter)
+    #changed this so that now every question is equal probability
+    #though obviously I still ask the same questions more than one way sometimes
+    #NOTE: if you update the number of questions in the round, you need to update these boundaries
+    x = random.randint(0,26)
+    if x <= 4:
+      R2Q0(questionCounter)
+    elif x <= 7:
+      R2Q1(questionCounter)
+    elif x <= 9:
+      R2Q2(questionCounter)
+    elif x <= 11:
+      R2Q3(questionCounter)
+    elif x <= 15:
+      R2Q4(questionCounter)
+    elif x <= 26:
+      R2Q5(questionCounter)
+
     questionCounter+=1
 
   if not suppressRoundBanner:

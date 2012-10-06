@@ -2236,7 +2236,7 @@ class PE:
         #the OPTIONAL_HEADER.SizeOfImage (Windows doesn't seem to care about the SizeOfHeaders
         #but I will update that anyway)
         if updateSizeOfImage:
-          self.OPTIONAL_HEADER.SizeOfImage += numSectToAdd*0x1000
+          self.OPTIONAL_HEADER.SizeOfImage += (self.sections[-1].Misc_VirtualSize + self.sections[-1].VirtualAddress)
         self.OPTIONAL_HEADER.SizeOfHeaders += totalSizeOfNewSectHdrs
         
         #Now create a holder section which will be reused

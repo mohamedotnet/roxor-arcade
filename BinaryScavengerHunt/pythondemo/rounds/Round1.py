@@ -384,13 +384,23 @@ def StartR1(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    x = random.randint(0,5)
-    {0:R1Q0,
-     1:R1Q1,
-     2:R1Q2,
-     3:R1Q3,
-     4:R1Q4,
-     5:R1Q5}[x](questionCounter)
+    #changed this so that now every question is equal probability
+    #though obviously I still ask the same questions more than one way sometimes
+    #NOTE: if you update the number of questions in the round, you need to update these boundaries
+    x = random.randint(0,25)
+    if x <= 1:
+      R1Q0(questionCounter)
+    elif x <= 5:
+      R1Q1(questionCounter)
+    elif x <= 8:
+      R1Q2(questionCounter)
+    elif x <= 13:
+      R1Q3(questionCounter)
+    elif x <= 16:
+      R1Q4(questionCounter)
+    elif x <= 25:
+      R1Q4(questionCounter)
+
     questionCounter+=1
 
   if not suppressRoundBanner:

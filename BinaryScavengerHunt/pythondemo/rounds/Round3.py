@@ -25,6 +25,7 @@ import rounds.helpers
 #but asks it for a random section, after randomizing their names
 #This shows that the naming conventions have no actual bearing on the execution
 def R3Q0(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
   Qs = ["What is the value of IMAGE_SECTION_HEADER.VirtualAddress?",
         "What is the RVA this section will be loaded at?",
         "What is the AVA this section will be loaded at?",
@@ -38,6 +39,7 @@ def R3Q0(questionCounter):
         "What is the value of IMAGE_SECTION_HEADER.SizeOfRawData?",
         "How much space does this section's data occupy on disk?",
         "What is the file offset for the first byte of data after this section?"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
 
   x = random.randint(0,3)
   if x == 0:
@@ -83,6 +85,7 @@ def R3Q0(questionCounter):
 
 #This function asks questions about IMAGE_SECTION_HEADER.Characteristics
 def R3Q1(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
   Qs = ["What is the value for this section's Characteristics?",
         "How many flags are set in the Characteristics?",
         "Does this section have the IMAGE_SCN_CTN_CODE characteristic set? (Y or N)",
@@ -99,12 +102,13 @@ def R3Q1(questionCounter):
         "Is this section discardable? (Y or N)",
         "Can this section be removed from memory when the loader is done with it? (Y or N)",
         "Does this section have the IMAGE_SCN_MEM_SHARED characteristic set? (Y or N)",
-        "Can this section bet shared between processes? (Y or N)",
+        "Can this section be shared between processes? (Y or N)",
         "Does this section have the IMAGE_SCN_MEM_EXECUTE characteristic set? (Y or N)",
         "Is this section executable? (Y or N)",
         "Does this section have the IMAGE_SCN_MEM_WRITE characteristic set? (Y or N)",
         "Is this section writable? (Y or N)"]
 #        "Does this section have the IMAGE_SCN_MEM_READ characteristic set? (Y or N)",
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
 
   x = random.randint(0,3)
   if x == 0:
@@ -190,7 +194,7 @@ def R3Q1(questionCounter):
   if q == 0:
     CheckAnswerNum(answer,pe.sections[randSectIndex].Characteristics)
   elif q == 1:
-    CheckAnswerNum(answer,10,numFlagsSet)
+    CheckAnswerNum(answer,numFlagsSet)
   elif q == 2 or q == 3:
     CheckAnswerString(answer,IMAGE_SCN_CTN_CODE)
   elif q == 4 or q == 5:
@@ -211,6 +215,7 @@ def R3Q1(questionCounter):
     CheckAnswerString(answer,IMAGE_SCN_MEM_WRITE)
 
 def R3Q2(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
   Qs = ["What is the section name that typically contains the program's main code?",
         "What is the section name that typically contains the program's writable global data?",
         "What is the section name that typically contains the program's read-only global data?",
@@ -222,7 +227,8 @@ def R3Q2(questionCounter):
         "What is the commonly used prefix for sections that can be paged to disk?",
         "What is the section name that typically contains 64 bit programs' exception handling data structures?",
         "Can a section's SizeOfRawData be larger than its VirtualSize? (Y or N)",
-        "Can a section's VirtualSize be larger than its SizeOfRawData? (Y or N)",]
+        "Can a section's VirtualSize be larger than its SizeOfRawData? (Y or N)"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -258,8 +264,10 @@ def R3Q2(questionCounter):
 #the correct ImageSize). Then ask a follow up question of what the correct
 #ImageSize should be
 def R3Q3(questionCounter):
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
   Qs = ["Is the Optional Header SizeOfImage value correct? (Y or N)",
   "Does the IMAGE_OPTIONAL_HEADER.SizeOfImage match the expected value based on the number and size of sections? (Y or N)"]
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
 
   #Just reusing the capability from R1Q4
   randomSectionNames = [".xeno", "xeno", ".kovah", "kovah", 
@@ -288,6 +296,8 @@ def R3Q3(questionCounter):
   #is greater than the existing header or not
   updateSizeOfImage = random.randint(0,1)
   pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, updateSizeOfImage, outFileName)
+  #Reopen the file otherwise the pe.sections[] calculations below won't be accurate
+  pe = pefile.PE(outFileName)
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -333,12 +343,19 @@ def StartR3(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    x = random.randint(0,3)
-    {0:R3Q0,
-     1:R3Q1,
-     2:R3Q2,
-     3:R3Q3,
-     }[x](questionCounter)
+    #changed this so that now every question is equal probability
+    #though obviously I still ask the same questions more than one way sometimes
+    #NOTE: if you update the number of questions in the round, you need to update these boundaries
+    x = random.randint(0,47)
+    if x <= 12:
+      R3Q0(questionCounter)
+    elif x <= 33:
+      R3Q1(questionCounter)
+    elif x <= 45:
+      R3Q2(questionCounter)
+    elif x <= 47:
+      R3Q3(questionCounter)
+      
     questionCounter+=1
 
   if not suppressRoundBanner:
