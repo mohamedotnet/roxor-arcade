@@ -44,17 +44,21 @@ def R3Q0(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
   RandomizeSectionNames(pe)
   
   #write out the modified file
-  outFileName = "Round3Q" + str(questionCounter) + ".exe"
+  outFileName = "Round3Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #pick a random section
@@ -113,12 +117,16 @@ def R3Q1(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
   #pick a random section
   randSectIndex = random.randint(0,len(pe.sections)-1)
@@ -181,7 +189,7 @@ def R3Q1(questionCounter):
     IMAGE_SCN_MEM_WRITE = "N"
 
   #write out the modified file
-  outFileName = "Round3Q" + str(questionCounter) + ".exe"
+  outFileName = "Round3Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question
@@ -280,14 +288,18 @@ def R3Q3(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
-  outFileName = "Round3Q" + str(questionCounter) + ".exe"
+  outFileName = "Round3Q" + str(questionCounter) + suffix
   #Created new function to insert random sections and write the file out
   numExtraSections = random.randint(1,5)
   totalNumSections = pe.FILE_HEADER.NumberOfSections + numExtraSections 
@@ -364,7 +376,7 @@ def StartR3(seed, suppressRoundBanner, escapeScore):
     roundMinutes = roundTime / 60
     roundSeconds = roundTime % 60
     totalElapsedTime = currentTime - rounds.helpers.gAbsoluteStartTime
-    print "\nCongratulations, you passed round 2!"
+    print "\nCongratulations, you passed round 3!"
     print "It took you %u minutes, %u seconds for this round." % (roundMinutes, roundSeconds)
     totalMinutes = totalElapsedTime / 60
     totalSeconds = totalElapsedTime % 60

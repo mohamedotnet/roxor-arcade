@@ -51,14 +51,18 @@ def R1Q1(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
-  outFileName = "Round1Q" + str(questionCounter) + ".exe"
+  outFileName = "Round1Q" + str(questionCounter) + suffix
 
   #pe.write(filename=outFileName)
   #Made a new function in pefile which also writes the file
@@ -93,12 +97,16 @@ def R1Q2(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
   #pick the random question
   q = random.randint(0,len(Qs)-1)
@@ -121,7 +129,7 @@ def R1Q2(questionCounter):
   currentYear = 1970 + int(currentTime / 31556926)    
  
   #write out the modified file
-  outFileName = "Round1Q" + str(questionCounter) + ".exe"
+  outFileName = "Round1Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question
@@ -154,15 +162,19 @@ def R1Q3(questionCounter):
   if x:
     if random.randint(0,1):
       pe = pefile.PE('../template32.exe')
+      suffix = ".exe"
     else:
       pe = pefile.PE('../template32.dll')
+      suffix = ".dll"
     binType = 32
     binTypeStr = "PE"
   else:
     if random.randint(0,1):
       pe = pefile.PE('../template64.exe')
+      suffix = ".exe"
     else:
       pe = pefile.PE('../template64.dll')
+      suffix = ".dll"
     binType = 64
     binTypeStr = "PE+"
   #print "selected %s binary" % binTypeStr
@@ -218,16 +230,19 @@ def R1Q4(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
-
+    suffix = ".dll"
     
   #write out the modified file
-  outFileName = "Round1Q" + str(questionCounter) + ".exe"
+  outFileName = "Round1Q" + str(questionCounter) + suffix
   #pe.write(filename=outFileName)
 
   #Created new function to insert random sections and write the file out
@@ -242,13 +257,13 @@ def R1Q4(questionCounter):
   print "For binary R1Bins/%s..." % outFileName
   if q == 2:
     if correctNumSections:
-      tmp = Qs[q] % totalNumSections
+      interpolatedQuestion = Qs[q] % totalNumSections
       correctStr = "Y"
     else:
-      tmp = Qs[q] % (totalNumSections + random.randint(1,2))
+      interpolatedQuestion = Qs[q] % (totalNumSections + random.randint(1,2))
       correctStr = "N"
   else:
-    tmp = Qs[q]
+    interpolatedQuestion = Qs[q]
 
   #Since we haven't actually modified pe.FILE_HEADER.NumberOfSections in the binary yet
   #this function will know whether to add new sections based on whether the first param
@@ -256,7 +271,7 @@ def R1Q4(questionCounter):
   pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, 1, outFileName)
 
   #ask question
-  print tmp
+  print interpolatedQuestion
   answer = raw_input("Answer: ")
 
   if q == 0 or q == 1:

@@ -2232,12 +2232,6 @@ class PE:
         sectHdrSize = self.sections[0].sizeof()
         totalSizeOfNewSectHdrs = numSectToAdd * sectHdrSize
         #print "totalSizeOfNewSectHdrs = %u" % totalSizeOfNewSectHdrs
-        #As I found out the hard way, it really doesn't like it if you don't update
-        #the OPTIONAL_HEADER.SizeOfImage (Windows doesn't seem to care about the SizeOfHeaders
-        #but I will update that anyway)
-        if updateSizeOfImage:
-          self.OPTIONAL_HEADER.SizeOfImage += (self.sections[-1].Misc_VirtualSize + self.sections[-1].VirtualAddress)
-        self.OPTIONAL_HEADER.SizeOfHeaders += totalSizeOfNewSectHdrs
         
         #Now create a holder section which will be reused
         tmpSection = SectionStructure( self.__IMAGE_SECTION_HEADER_format__, pe=self )
@@ -2269,6 +2263,13 @@ class PE:
           file_data[offsetAfterSectHdr:offsetAfterSectHdr] = list(tmpSection.__pack__())
           offsetAfterSectHdr += sectHdrSize
           i += 1
+
+        #As I found out the hard way, it really doesn't like it if you don't update
+        #the OPTIONAL_HEADER.SizeOfImage (Windows doesn't seem to care about the SizeOfHeaders
+        #but I will update that anyway)
+        if updateSizeOfImage:
+          self.OPTIONAL_HEADER.SizeOfImage = (tmpSection.Misc_VirtualSize + tmpSection.VirtualAddress)
+        self.OPTIONAL_HEADER.SizeOfHeaders += totalSizeOfNewSectHdrs
 
         #Now insert the nops after the section headers to pad out 
         #the write to a total displacement size of FileAlignment

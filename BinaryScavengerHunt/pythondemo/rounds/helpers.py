@@ -49,7 +49,7 @@ def CheckAnswerNum(studentAnswer, correctAnswer):
     print "~tweeEEtle deeEEtle deeEEt~ W4Rp W1zzL3 4 5h1zzl3!"
     return
 
-  print studentAnswer
+  #print studentAnswer
   #ch347 0xc0d3zzz
   if studentAnswer == "x":
     gScore += 100
@@ -137,3 +137,14 @@ def RandomizeSectionNames(pe):
       x = random.randint(0,len(randomSectionNames)-1)
     pickedIndices.append(x)
     section.Name = randomSectionNames[x]
+
+#Requires there to already be a file in ../exports with
+#entries of the form "RVA exportName" one per line
+def GetExportsByName(dllName):
+  fileName = "../exports/" + dllName
+  with open(fileName, 'r') as f:
+    lines = f.read().splitlines()
+  exportNames = []
+  for line in lines:
+    exportNames.append(line.split()[1])
+  return exportNames

@@ -26,10 +26,10 @@ import rounds.helpers
 def R2Q0(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the IMAGE_OPTIONAL_HEADER.Magic value?",
-  "What value of the optional header 'Magic' field indicates a 32 bit (PE32) binary?",
-  "According to the IMAGE_OPTIONAL_HEADER.Magic, is this a 32 bit (PE32) binary? (Y or N)",
-  "What value of the optional header 'Magic' field indicates a 64 bit (PE32+) binary?",
-  "According to the IMAGE_OPTIONAL_HEADER.Magic, is this a 64 bit (PE32+) binary? (Y or N)"]
+        "What value of the optional header 'Magic' field indicates a 32 bit (PE32) binary?",
+        "According to the IMAGE_OPTIONAL_HEADER.Magic, is this a 32 bit (PE32) binary? (Y or N)",
+        "What value of the optional header 'Magic' field indicates a 64 bit (PE32+) binary?",
+        "According to the IMAGE_OPTIONAL_HEADER.Magic, is this a 64 bit (PE32+) binary? (Y or N)"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   #For simplicity, rather than trying to go through the rigamarole of
@@ -39,20 +39,24 @@ def R2Q0(questionCounter):
   if x:
     if random.randint(0,1):
       pe = pefile.PE('../template32.exe')
+      suffix = ".exe"
     else:
       pe = pefile.PE('../template32.dll')
+      suffix = ".dll"
     is32 = "Y"
     is64= "N"
   else:
     if random.randint(0,1):
       pe = pefile.PE('../template64.exe')
+      suffix = ".exe"
     else:
       pe = pefile.PE('../template64.dll')
+      suffix = ".dll"
     is32 = "N"
     is64= "Y"
 
   #write out the (actually un)modified file
-  outFileName = "Round2Q" + str(questionCounter) + ".exe"
+  outFileName = "Round2Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question
@@ -87,25 +91,29 @@ def R2Q0(questionCounter):
 def R2Q1(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.AddressOfEntryPoint?",
-  "What is the RVA of the first code which executes in this binary?",
-  "What is the AVA of the first code which executes in this binary?"]
+        "What is the RVA of the first code which executes in this binary?",
+        "What is the AVA of the first code which executes in this binary?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
 
   #TODO: randomize this a bit (just want to get the basics of the question for now)
 
   #write out the (actually un)modified file
-  outFileName = "Round2Q" + str(questionCounter) + ".exe"
+  outFileName = "Round2Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question
@@ -127,25 +135,29 @@ def R2Q1(questionCounter):
 def R2Q2(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.ImageBase?",
-  "What is the preferred AVA this binary would like to be loaded into memory at?"]
+        "What is the preferred AVA this binary would like to be loaded into memory at?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
-  #TODO: randomize, but...
-  #If we're going to rebase it, we have to fix up all the relocations
-  #Since if the loader loads it at that address it won't use them
+  newBase = 0x10000 * random.randint(0, 0x1000)
+  pe.relocate_image(newBase)
+  pe.OPTIONAL_HEADER.ImageBase = newBase
 
   #write out the modified file
-  outFileName = "Round2Q" + str(questionCounter) + ".exe"
+  outFileName = "Round2Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question
@@ -156,13 +168,13 @@ def R2Q2(questionCounter):
   answer = raw_input("Answer: ")
 
   if q == 0 or q == 1:
-    CheckAnswerNum(answer,pe.OPTIONAL_HEADER.ImageBase) 
+    CheckAnswerNum(answer,newBase) 
 
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.SizeOfImage
 def R2Q3(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.SizeOfImage?",
-  "What is the total amount of memory this binary will reserve in memory?"]
+        "What is the total amount of memory this binary will reserve in memory?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   #Just reusing the capability from R1Q4
@@ -177,14 +189,18 @@ def R2Q3(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
-  outFileName = "Round2Q" + str(questionCounter) + ".exe"
+  outFileName = "Round2Q" + str(questionCounter) + suffix
 
   #Created new function to insert random sections and write the file out
   numExtraSections = random.randint(1,5)
@@ -216,18 +232,22 @@ def R2Q4(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
 
   #TODO: randomize this a bit (just want to get the basics of the question for now)
 
   #write out the (actually un)modified file
-  outFileName = "Round2Q" + str(questionCounter) + ".exe"
+  outFileName = "Round2Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question
@@ -269,12 +289,16 @@ def R2Q5(questionCounter):
   x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32.exe')
+    suffix = ".exe"
   elif x == 1:
     pe = pefile.PE('../template64.exe')
+    suffix = ".exe"
   elif x == 2:
     pe = pefile.PE('../template32.dll')
+    suffix = ".dll"
   else:
     pe = pefile.PE('../template64.dll')
+    suffix = ".dll"
 
 
   numFlagsSet = 0
@@ -314,7 +338,7 @@ def R2Q5(questionCounter):
     pe.OPTIONAL_HEADER.DllCharacteristics &= ~0x8000
     termSrv = "N"
   #write out the modified file
-  outFileName = "Round2Q" + str(questionCounter) + ".exe"
+  outFileName = "Round2Q" + str(questionCounter) + suffix
   pe.write(filename=outFileName)
 
   #Print the question

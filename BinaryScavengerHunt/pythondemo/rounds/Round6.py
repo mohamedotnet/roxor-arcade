@@ -21,6 +21,14 @@ from time import time
 from rounds.helpers import CheckAnswerNum, CheckAnswerString
 import rounds.helpers
 
+#Question about export by ordinal
+
+
+#TODO: Now that we've covered exports
+#add a question about AVA of a given import
+#note: this seems like it will require either including the binaries
+#or just making up a presumed base address and then pointing them
+#at the ../exports/ files
 
 def StartR6(seed, suppressRoundBanner, escapeScore):
   global gScore
