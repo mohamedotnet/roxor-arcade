@@ -28,7 +28,7 @@ import rounds.helpers
 #This function asks questions about the IMAGE_OPTIONAL_HEADER.DataDirectory entries
 #that pertain to normal imports
 def R4Q0(questionCounter):
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].RVA?",
         "What is the RVA that points at the import directory table?",
         "What is the value of IMAGE_OPTIONAL_HEADER.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size?",
@@ -37,7 +37,7 @@ def R4Q0(questionCounter):
         "What is the RVA that points directly at the Import Address Table (IAT)?",
         "What is the value of IMAGE_OPTIONAL_HEADER.DataDirectory[IMAGE_DIRECTORY_ENTRY_IAT].Size?",
         "What is the total size of the Import Address Table (IAT)?"]
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
 
   x = random.randint(0,3)
   if x == 0:
@@ -75,11 +75,11 @@ def R4Q0(questionCounter):
     CheckAnswerNum(answer,pe.OPTIONAL_HEADER.DATA_DIRECTORY[12].Size)
     
 def R4Q1(questionCounter):
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
   Qs = ["How many DLLs does this binary import from?",
         "How many entries are there in the import directory table?",
         "Does this binary directly import functions from %s? (Y or N)"]
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
   
   #These names should all be things that none of the template binaries actually import from
   randomDLLNames = ["ADVAPI32.dll", "GDI32.dll", "SHELL32.dll", "NTDLL.dll", 
@@ -129,11 +129,11 @@ def R4Q1(questionCounter):
     CheckAnswerString(answer,importsNamedDll)
 
 def R4Q2(questionCounter):
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
   Qs = ["What section is the import directory table in?",
         "In what section can the IAT be found?",
         "What section is the import address table in?"]
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
 
   x = random.randint(0,3)
   if x == 0:
@@ -182,14 +182,14 @@ def R4Q2(questionCounter):
         CheckAnswerString(mungedAnswer,section.Name)
 
 def R4Q3(questionCounter):
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
   Qs = ["How many functions does this import from %s?",
         "At what RVA do the IAT entries from %s start?",
         "At what AVA do the IAT entries from %s start?",
         "At what RVA do the INT entries from %s start?",
         "At what AVA do the INT entries from %s start?",
         "Does this import function %s!%s? (Y or N)"]
-  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
+  #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
 
   #These names should all be things that none of the template binaries actually import from the DLLs they do import from
   nonImportedFunctionNames = ["foo"]
@@ -256,6 +256,8 @@ def R4Q3(questionCounter):
   elif q == 5:
     CheckAnswerString(answer, realImport)
 
+#TODO: make a question about the hint value for a given real import
+
 #TODO, make a question where I ask about the file offset for some of the RVA things.
 #This will require them to map the RVA to the appropriate section, figure out the intra-section
 #offset, and then add that offset to the PointerToRawData for the section
@@ -275,9 +277,9 @@ def StartR4(seed, suppressRoundBanner, escapeScore):
     print "================================================================================"
     print "Welcome to Round 4:"
     print "This round is all about \"normal\" imports and the Import Address Table (IAT)"
-#    print "\nRound terminology note:"
-#    print "RVA = Relative Virtual Address (relative to image base)."
-#    print "AVA = Absolute Virtual Address (base + RVA)"
+    print "\nRound terminology note:"
+    print "RVA = Relative Virtual Address (relative to image base)."
+    print "AVA = Absolute Virtual Address (base + RVA)"
     print "================================================================================\n"
   #making a directory that the files go into, just to keep things tidier
   try:
@@ -293,17 +295,18 @@ def StartR4(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    #changed this so that now every question is equal probability
-    #though obviously I still ask the same questions more than one way sometimes
+    #Now changed it so that a given R*Q* only has as many chances to be called
+    #as it has calls to CheckAnswer*. This way the number of variant ways
+    #to ask the question doesn't increase the probability of the question being asked
     #NOTE: if you update the number of questions in the round, you need to update these boundaries
-    x = random.randint(0,18)
-    if x <= 7:
+    x = random.randint(0,14)
+    if x <= 3:
       R4Q0(questionCounter)
-    elif x <= 9:
+    elif x <= 5:
       R4Q1(questionCounter)
-    elif x <= 12:
+    elif x <= 8:
       R4Q2(questionCounter)
-    elif x <= 18:
+    elif x <= 14:
       R4Q3(questionCounter)
       
     questionCounter+=1

@@ -61,17 +61,6 @@ def R2Q0(questionCounter):
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
-#  if q == 0:
-#    print "answer = %x" % pe.OPTIONAL_HEADER.Magic
-#  elif q == 1:
-#    print "answer = %x" % 0x010B
-#  elif q == 2:
-#    print "answer = %s" % is32
-#  elif q == 3:
-#    print "answer = %x" % 0x020B  
-#  elif q == 4:
-#    print "answer = %s" % is64
-  
   print "For binary R2Bins/%s..." % outFileName
   print Qs[q]
   answer = raw_input("Answer: ")
@@ -118,10 +107,6 @@ def R2Q1(questionCounter):
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
-#  if q == 0 or q == 1:
-#    print "answer = %x" % pe.OPTIONAL_HEADER.AddressOfEntryPoint
-#  elif q == 2:
-#    print "answer = %x" % (pe.OPTIONAL_HEADER.AddressOfEntryPoint + pe.OPTIONAL_HEADER.ImageBase)
   print "For binary R2Bins/%s..." % outFileName  
   print Qs[q]
   answer = raw_input("Answer: ")
@@ -387,21 +372,22 @@ def StartR2(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    #changed this so that now every question is equal probability
-    #though obviously I still ask the same questions more than one way sometimes
+    #Now changed it so that a given R*Q* only has as many chances to be called
+    #as it has calls to CheckAnswer*. This way the number of variant ways
+    #to ask the question doesn't increase the probability of the question being asked
     #NOTE: if you update the number of questions in the round, you need to update these boundaries
-    x = random.randint(0,26)
+    x = random.randint(0,16)
     if x <= 4:
       R2Q0(questionCounter)
-    elif x <= 7:
+    elif x <= 6:
       R2Q1(questionCounter)
-    elif x <= 9:
+    elif x <= 7:
       R2Q2(questionCounter)
-    elif x <= 11:
+    elif x <= 8:
       R2Q3(questionCounter)
-    elif x <= 15:
+    elif x <= 10:
       R2Q4(questionCounter)
-    elif x <= 26:
+    elif x <= 16:
       R2Q5(questionCounter)
 
     questionCounter+=1

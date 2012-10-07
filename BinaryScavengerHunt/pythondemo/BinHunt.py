@@ -65,17 +65,17 @@ else:
 
 helpers.gStartingSeed = seed
 
-#Round1.StartR1(seed, 0, 1000)
+Round1.StartR1(seed, 0, 1000)
 if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-#Round2.StartR2(seed, 0, 2000)
-#RandomQuestionsFromPreviousRounds(seed, 2500, 1)
+Round2.StartR2(seed, 0, 2000)
+RandomQuestionsFromPreviousRounds(seed, 2500, 1)
 if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")
-#Round3.StartR3(seed, 0, 3500)
-#RandomQuestionsFromPreviousRounds(seed, 4000, 2)
+Round3.StartR3(seed, 0, 3500)
+RandomQuestionsFromPreviousRounds(seed, 4000, 2)
 if mode == "2":
   print "WAIT for your instructor to tell you the seed.\n"
   seed = raw_input("Enter the seed: ")

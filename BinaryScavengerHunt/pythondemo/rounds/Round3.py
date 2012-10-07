@@ -355,17 +355,18 @@ def StartR3(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    #changed this so that now every question is equal probability
-    #though obviously I still ask the same questions more than one way sometimes
+    #Now changed it so that a given R*Q* only has as many chances to be called
+    #as it has calls to CheckAnswer*. This way the number of variant ways
+    #to ask the question doesn't increase the probability of the question being asked
     #NOTE: if you update the number of questions in the round, you need to update these boundaries
     x = random.randint(0,47)
-    if x <= 12:
+    if x <= 8:
       R3Q0(questionCounter)
-    elif x <= 33:
+    elif x <= 19:
       R3Q1(questionCounter)
-    elif x <= 45:
+    elif x <= 30:
       R3Q2(questionCounter)
-    elif x <= 47:
+    elif x <= 32:
       R3Q3(questionCounter)
       
     questionCounter+=1

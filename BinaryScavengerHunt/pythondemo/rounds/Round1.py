@@ -208,8 +208,8 @@ def R1Q3(questionCounter):
 #This function deals with questions about FILE_HEADER.NumberOfSections
 #But in order to randomize that, it can insert random sections
 def R1Q4(questionCounter):
-  Qs = ["How many sections does this binary have? ",
-        "What is the IMAGE_FILE_HEADER.NumberOfSections field? ",
+  Qs = ["How many sections does this binary have?",
+        "What is the IMAGE_FILE_HEADER.NumberOfSections field?",
         "Does this binary have %u sections? (Y or N)"]
 
   #to point out that section names don't have to start with a .
@@ -399,21 +399,22 @@ def StartR1(seed, suppressRoundBanner, escapeScore):
   random.seed(seed)
   questionCounter = 0;
   while rounds.helpers.gScore < rounds.helpers.gNextLevelRequiredScore:
-    #changed this so that now every question is equal probability
-    #though obviously I still ask the same questions more than one way sometimes
+    #Now changed it so that a given R*Q* only has as many chances to be called
+    #as it has calls to CheckAnswer*. This way the number of variant ways
+    #to ask the question doesn't increase the probability of the question being asked
     #NOTE: if you update the number of questions in the round, you need to update these boundaries
-    x = random.randint(0,25)
+    x = random.randint(0,18)
     if x <= 1:
       R1Q0(questionCounter)
-    elif x <= 5:
+    elif x <= 3:
       R1Q1(questionCounter)
-    elif x <= 8:
+    elif x <= 6:
       R1Q2(questionCounter)
-    elif x <= 13:
+    elif x <= 10:
       R1Q3(questionCounter)
-    elif x <= 16:
+    elif x <= 12:
       R1Q4(questionCounter)
-    elif x <= 25:
+    elif x <= 18:
       R1Q4(questionCounter)
 
     questionCounter+=1
