@@ -163,6 +163,8 @@ def R4Q2(questionCounter):
   print Qs[q]
   answer = raw_input("Answer: ")
 
+  #TODO: update this to use pe.get_section_by_rva?
+
   if q == 0:
     for section in pe.sections:
       if (section.VirtualAddress <= pe.OPTIONAL_HEADER.DATA_DIRECTORY[1].VirtualAddress and
@@ -261,6 +263,7 @@ def R4Q3(questionCounter):
 #TODO, make a question where I ask about the file offset for some of the RVA things.
 #This will require them to map the RVA to the appropriate section, figure out the intra-section
 #offset, and then add that offset to the PointerToRawData for the section
+#NOTE: looks like I can probably use pe.get_physical_by_rva to get the answer on my side
 
 #TODO: need question about import by ordinal, but none of my templates do currently
 #Wait until I have the ability to insert arbitrary imports

@@ -2110,17 +2110,17 @@ class PE:
         multiples of 4 bytes long.
         """
 
-	maxSize = self.OPTIONAL_HEADER.FileAlignment
-	if len(bytelist) > maxSize:
-	  print "input bytelist too long"
-	  return "input bytelist too long"
-
+      	maxSize = self.OPTIONAL_HEADER.FileAlignment
+      	if len(bytelist) > maxSize:
+      	  print "input bytelist too long"
+      	  return "input bytelist too long"
+      
         if (len(bytelist) % 4) != 0:
-	  print "bytelist not 4 byte aligned"
-	  return "bytelist not 4 byte aligned"
-
-	nopStr = ['\x90'] * (maxSize - len(bytelist))
-#	nopStr.extend(bytelist)
+      	  print "bytelist not 4 byte aligned"
+      	  return "bytelist not 4 byte aligned"
+      
+      	nopStr = ['\x90'] * (maxSize - len(bytelist))
+      #	nopStr.extend(bytelist)
 
         file_data = list(self.__data__)
  
@@ -2305,6 +2305,222 @@ class PE:
             f.close()
         else:
             return new_file_data
+
+############################################################ (it's so I can see where my functions break better :P)
+
+    #Doing a whole lot of work to create faux-delay-load IAT entries
+    def CreateDelayLoadEntries(self, randomDllList, randomFunctionsList, filename=None):
+        """Create a new section after all the existing sections
+
+        Inside the last section, place a delayed import descriptor table
+        the delay load IAT, the delay load INT, the DLL names table, etc
+        """
+        file_data = list(self.__data__)
+
+        self.FILE_HEADER.NumberOfSections += 1
+        numDelayLoadEntries = len(randomDllList)
+
+        i = 0
+        dlIDT = []
+        #We make one more than is requested so that we have an empty entry
+        while i < numDelayLoadEntries:
+          d_import_desc =  Structure(self.__IMAGE_DELAY_IMPORT_DESCRIPTOR_format__)
+          structSize = Structure(self.__IMAGE_DELAY_IMPORT_DESCRIPTOR_format__).sizeof()
+          d_import_desc.__unpack__("\0"*structSize)
+          d_import_desc.grAttrs = 1
+          d_import_desc.pIAT = 0xAAAAAAAA
+          d_import_desc.pINT = 0xBBBBBBBB
+          d_import_desc.szName = 0xCCCCCCCC
+          dlIDT.append(d_import_desc)
+          i += 1
+        #Then add the null terminating entry
+        d_import_desc =  Structure(self.__IMAGE_DELAY_IMPORT_DESCRIPTOR_format__)
+        structSize = Structure(self.__IMAGE_DELAY_IMPORT_DESCRIPTOR_format__).sizeof()
+        d_import_desc.__unpack__("\0"*structSize)
+        dlIDT.append(d_import_desc)
+        
+        totalDelayLoadDirectoryTableSize = structSize * (numDelayLoadEntries+1)
+        #Update the running total size of all the stuff we're going to put in this section
+        totalDelayLoadDataSizeForEverything = totalDelayLoadDirectoryTableSize
+
+        #Now create a holder section
+        tmpSection = SectionStructure( self.__IMAGE_SECTION_HEADER_format__, pe=self )
+        if not tmpSection:
+          return
+        sectHdrSize = self.sections[0].sizeof()
+        tmpSection.__unpack__("\0"*sectHdrSize) #fill in with all zeros to start
+
+        #Get the ending virtual address of the last section
+        existingLastSectionEndVA = self.sections[-1].VirtualAddress + self.sections[-1].Misc_VirtualSize
+        #round up to the nearest 0x1000
+        if existingLastSectionEndVA % 1000:
+          existingLastSectionEndVA += (0x1000 - existingLastSectionEndVA % 0x1000)
+        
+        ######## Now get into the nitty gritty of setting up all the stuff that comes after the DLIDT ########
+        offsetAfterDLIDT = existingLastSectionEndVA + totalDelayLoadDirectoryTableSize
+        x = 0
+        dlDllNames = [] #multi-dimensional byte array of the DLL names with null terminator bytes
+        dlIAT = []  #multi-dimensional int array of RVAs pointing at dynamic load code
+                    #(but we will use fake, but realistic-looking, addresses)
+        dlINT = [] #multi-dimensional int array of RVAs pointing at hint/name structs
+        dlHintNames = [] #multi-dimensional array of hint(short/WORD) and name (null terminated string) structs
+        masterByteArray = [] #This will accumulate all the data as we go along
+        while x < numDelayLoadEntries:
+          #Start by filling in the location of the DLL
+          dlIDT[x].szName = offsetAfterDLIDT + len(masterByteArray)
+          
+          #Set up our DLL names to go after the DLIDT
+#          afterDllNamesOffset[x] = offsetAfterDLIDT + len(dllNames)
+          dlDllNames += [[]]
+          dlDllNames[x] += list(randomDllList[x])
+          dlDllNames[x] += ['\x00']
+          masterByteArray += dlDllNames[x]
+          #print masterByteArray
+          
+          #Now set up the DL-IAT because it doesn't depend on anything else
+          #For simplicity we will only do 10 entries per DLL
+          dlIDT[x].pIAT = offsetAfterDLIDT + len(masterByteArray)
+          numFunctionsPerDLL = 10
+          i = 0
+          dlIAT += [[]] #Have to do this so we can do dlIAT[x]
+          while i < numFunctionsPerDLL:
+            dlIAT[x] += [self.OPTIONAL_HEADER.ImageBase + self.sections[0].VirtualAddress + i*0x10]
+            masterByteArray += struct.pack("@I",dlIAT[x][i])
+            i+=1
+          dlIAT[x] += [0] #add the null terminator
+          masterByteArray += struct.pack("@I",0)
+#          masterByteArray += dlIAT[x]
+          #print masterByteArray
+          
+          #Now set up the DL-INT & hint/names table at the same time
+          #But all the hints will just be 0000
+          dlIDT[x].pINT = offsetAfterDLIDT + len(masterByteArray)
+          i = 0
+          offsetAfterDLINT = dlIDT[x].pINT + 4*(numFunctionsPerDLL+1)
+          dlINT += [[]] #Have to do this so we can do dlINT[x]
+          while i < numFunctionsPerDLL:
+            dlINT[x] += [offsetAfterDLINT]
+            i+=1
+          dlINT[x] += [0] #add the null terminator
+          
+          #Build up the hint/names table as a big byte list so I can easily get the length
+          #to update the INT RVAs and then easily write it to the file too
+          #NOTE: in mspaint, all the hint/name RVAs seemed to start on a 2 byte boundary
+          #so I'm going to go with that convention just because
+          i = 0
+          dlHintNames += [[]]
+          while i < numFunctionsPerDLL:
+            dlINT[x][i] += len(dlHintNames[x])
+            dlHintNames[x] += ['\x00', '\x00'] #this is the empty hint WORD
+            randomFunc = randomFunctionsList[x][random.randint(0, len(randomFunctionsList)-1)]
+            dlHintNames[x] += list(randomFunc) #FIXME: change to real symbol name
+            dlHintNames[x] += ['\x00'] #null terminator (FIXME: confirm this is necessary?)
+            if (len(randomFunc)+1) % 2:
+              dlHintNames[x] += ['\x00', '\x00', '\x00'] #2 byte align with an empty hint and string
+            i+=1
+          
+          #Now that all the dlINT entries are filled in, go ahead and add the dlINT to the masterByteArray
+          i = 0
+          for num in dlINT[x]:
+            masterByteArray += struct.pack("@I",num)
+          #print masterByteArray
+          masterByteArray += dlHintNames[x]
+          #print masterByteArray
+
+          x+=1 #done with the loop
+        
+        #Finalize our DLIDT last, because the values depend on previous components
+        #Turn our Delay Load Import Directory Table into a byte list
+        #while simultaneously building up the DLL names array
+        dlidtBytes = []
+        i = 0
+        while i <= numDelayLoadEntries:
+          d = dlIDT[i]
+          dlidtBytes += list(d.__pack__())
+          i+=1
+        ###Insert our actual Delay Load Import Directory Table at the end of the file
+        fileDataLenBeforeInserts = len(file_data) #use this for our pointerToRawData
+        file_data += dlidtBytes
+        
+        ###write all the rest of the data which we've accumulated
+        file_data += masterByteArray
+
+        totalSectionSize = len(dlidtBytes) + len(masterByteArray)
+        #Create the padding string which will be written after the inserted section headers
+        nopStr = ['\x90'] * (self.OPTIONAL_HEADER.FileAlignment - (totalSectionSize % self.OPTIONAL_HEADER.FileAlignment))
+        ###Now insert the nops after the section headers to pad out 
+        #the write to a total displacement size of FileAlignment
+        file_data += nopStr
+        
+        ####### DONE with most of the delay load stuff. Now add the section header, now that we know the total size the section ####### 
+        
+        #We're still going to insert the new sect hdr after the existing sect hdrs
+        offsetAfterSectHdr = self.sections[-1].get_file_offset() + sectHdrSize
+
+        #Set all the section information
+        tmpSection.set_file_offset(offsetAfterSectHdr)
+        tmpSection.Name = ".dload"
+        tmpSection.Misc_VirtualSize = totalSectionSize
+        #Once we've got the size of all our data, pad it out to 
+        #the self.OPTIONAL_HEADER.FileAlignment size
+        tmpSection.SizeOfRawData = totalSectionSize + (self.OPTIONAL_HEADER.FileAlignment - (totalSectionSize % self.OPTIONAL_HEADER.FileAlignment))
+        tmpSection.VirtualAddress = existingLastSectionEndVA
+        #Need to account for the fact that the end of the file location will
+        #change right after we insert our own section header + padding
+        tmpSection.PointerToRawData = fileDataLenBeforeInserts + self.OPTIONAL_HEADER.FileAlignment
+        tmpSection.Characteristics = 0x40000040
+
+        #Insert the section into the file
+        file_data[offsetAfterSectHdr:offsetAfterSectHdr] = list(tmpSection.__pack__())
+        offsetAfterSectHdr += sectHdrSize
+
+        #Create the padding string which will be written after the inserted section headers
+        nopStr = ['\x90'] * (self.OPTIONAL_HEADER.FileAlignment - sectHdrSize)
+        #Now insert the nops after the section headers to pad out 
+        #the write to a total displacement size of FileAlignment
+        file_data[offsetAfterSectHdr:offsetAfterSectHdr] = nopStr
+
+        #As I found out the hard way, it really doesn't like it if you don't update
+        #the OPTIONAL_HEADER.SizeOfImage (Windows doesn't seem to care about the SizeOfHeaders
+        #but I will update that anyway)
+        self.OPTIONAL_HEADER.SizeOfImage = (totalDelayLoadDataSizeForEverything + tmpSection.VirtualAddress)
+        self.OPTIONAL_HEADER.SizeOfHeaders += sectHdrSize
+
+        #Update all the PointerToRawData entries to account for the insert of the sectHdrSize + padding worth of data
+        for section in self.sections:
+            section.PointerToRawData += self.OPTIONAL_HEADER.FileAlignment
+        
+        #Set the relevant data directory entries to say that we now have a delay load import directory table
+        self.OPTIONAL_HEADER.DATA_DIRECTORY[13].VirtualAddress = tmpSection.VirtualAddress
+        self.OPTIONAL_HEADER.DATA_DIRECTORY[13].Size = len(dlidtBytes)
+        #NOTE: this assumes that this is called on template32-bound.*
+        if(self.OPTIONAL_HEADER.DATA_DIRECTORY[11].VirtualAddress):
+          self.OPTIONAL_HEADER.DATA_DIRECTORY[11].VirtualAddress += self.OPTIONAL_HEADER.FileAlignment
+
+        self.OPTIONAL_HEADER.CheckSum = self.generate_checksum()
+
+        #Update every struct's ostensible location in the file to account for the insert
+        #So that when it gets written back, it will be in the right place
+        for structure in self.__structures__:
+
+            offset = structure.get_file_offset()
+            if offset >= tmpSection.get_file_offset():
+              structure.set_file_offset(offset + self.OPTIONAL_HEADER.FileAlignment)
+            
+            offset = structure.get_file_offset()
+            struct_data = list(structure.__pack__())
+            file_data[offset:offset+len(struct_data)] = struct_data
+
+        new_file_data = ''.join( [ chr(ord(c)) for c in file_data] )
+
+        if filename:
+            f = file(filename, 'wb+')
+            f.write(new_file_data)
+            f.close()
+        else:
+            return new_file_data
+
+
 ###################################
 # END XENO'S CHANGES
 ###################################

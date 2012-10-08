@@ -11,8 +11,7 @@
 # Special thanks to Ero Carrera for creating the pefile python library,
 # without which, making this game would have taken much longer
 
-#This is Round 3 and will cover questions on the IMAGE_SECTION_HEADER
-#and about the sections in the binary
+#This is Round 7 and will cover questions on relocations and debug info
 
 import os
 import random
@@ -20,6 +19,10 @@ import pefile
 from time import time
 from rounds.helpers import CheckAnswerNum, CheckAnswerString
 import rounds.helpers
+
+#Q: According to the debugging information, when was this file compiled?
+#Q: does the debug TimeDateStamp match the File Header TimeDateStamp?
+#Q: What is the path where this file was compiled
 
 
 def StartR7(seed, suppressRoundBanner, escapeScore):

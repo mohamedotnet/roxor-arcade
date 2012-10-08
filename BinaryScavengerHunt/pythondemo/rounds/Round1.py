@@ -349,11 +349,7 @@ def R1Q5(questionCounter):
   else:
     pe.FILE_HEADER.Characteristics &= ~0x100
     is32Characteristics = "N"
-    
-#  print "selected %s binary" % binTypeStr
-#  print "isExe = %s, isDll = %s" % (isExe, isDll)
-#  print "numFlagsSet = %u, isLargeAware = %s, is32Characteristics = %s" % (numFlagsSet, isLargeAware, is32Characteristics)
- 
+     
   #write out the modified file
   outFileName = "Round1Q" + str(questionCounter) + ".txt"
   pe.write(filename=outFileName)
