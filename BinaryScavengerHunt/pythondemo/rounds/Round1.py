@@ -89,7 +89,7 @@ def R1Q1(questionCounter):
 
 #This function deals with questions about FILE_HEADER.TimeDateStamp
 def R1Q2(questionCounter):
-  Qs = ["What year was this binary compiled according to the TimeDateStamp?",
+  Qs = ["What year was this binary compiled according to the file header TimeDateStamp?",
         "What is the IMAGE_FILE_HEADER's TimeDateStamp?",
         "How many years old is this binary? (round down)"]
 
@@ -167,7 +167,7 @@ def R1Q3(questionCounter):
       pe = pefile.PE('../template32.dll')
       suffix = ".dll"
     binType = 32
-    binTypeStr = "PE"
+    binTypeStr = "PE32"
   else:
     if random.randint(0,1):
       pe = pefile.PE('../template64.exe')
@@ -176,7 +176,7 @@ def R1Q3(questionCounter):
       pe = pefile.PE('../template64.dll')
       suffix = ".dll"
     binType = 64
-    binTypeStr = "PE+"
+    binTypeStr = "PE32+"
   #print "selected %s binary" % binTypeStr
    
   #In the future we might want to make modifications to the template binary in every case

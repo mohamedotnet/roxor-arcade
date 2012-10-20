@@ -139,9 +139,9 @@ def R5Q2(questionCounter):
   Qs = ["How many ImgDelayDescr structures are in the delayed import directory table (excluding the null entry)?",
         "How many DLLs are referenced by the delay import directory table?",
         "What is the RVA of the delayed IAT for %s?",
-        "What is the AVA of the delayed IAT for %s?",
+        "What is the VA of the delayed IAT for %s?",
         "What is the RVA of the delayed INT for %s?",
-        "What is the AVA of the delayed INT for %s?"]
+        "What is the VA of the delayed INT for %s?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR5
 
   possibleDLLNames = ["ADVAPI32.dll", "GDI32.dll", "SHELL32.dll", "NTDLL.dll", 
@@ -212,7 +212,14 @@ def R5Q3(questionCounter):
         "How many IMAGE_BOUND_FORWARDER_REF structures are in the bound import directory table?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR5
 
-  x = random.randint(0,7)
+  totalBoundRefs = 0
+
+  q = random.randint(0,len(Qs)-1)
+
+  if q == 0:
+    x = random.randint(0,7)
+  else:
+    x = random.randint(0,3)
   if x == 0:
     pe = pefile.PE('../template32-bound.exe')
     suffix = ".exe"
@@ -239,12 +246,11 @@ def R5Q3(questionCounter):
     suffix = ".dll"
   if x <= 3:
     importType = "bound"
+    for entry in pe.DIRECTORY_ENTRY_BOUND_IMPORT:
+      totalBoundRefs += len(entry.entries)
   else:
     importType = "normal"
 
-  totalBoundRefs = 0
-  for entry in pe.DIRECTORY_ENTRY_BOUND_IMPORT:
-    totalBoundRefs += len(entry.entries)
   #TODO: want to be able to randomize entries/size of delay load IAT
 
   #write out the (actually un)modified file
@@ -252,13 +258,12 @@ def R5Q3(questionCounter):
   pe.write(outFileName)
   
   #Print the question
-  q = random.randint(0,len(Qs)-1)
   print "For binary R5Bins/%s..." % outFileName
   print Qs[q]
   answer = raw_input("Answer: ")
 
   if q == 0:
-    CheckAnswerNum(answer,importType)
+    CheckAnswerString(answer,importType)
   elif q == 1:
     CheckAnswerNum(answer,totalBoundRefs)
 
@@ -268,11 +273,11 @@ def StartR5(seed, suppressRoundBanner, escapeScore):
   global gNextLevelRequiredScore
   if not suppressRoundBanner:
     print "================================================================================"
-    print "Welcome to Round 4:"
+    print "Welcome to Round 5:"
     print "This round is all about \"bound\" imports and delay-loaded imports"
     print "\nRound terminology note:"
     print "RVA = Relative Virtual Address (relative to image base)."
-    print "AVA = Absolute Virtual Address (base + RVA)"
+    print "VA = Absolute Virtual Address (base + RVA)"
     print "================================================================================\n"
   #making a directory that the files go into, just to keep things tidier
   try:

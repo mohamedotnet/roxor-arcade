@@ -81,7 +81,7 @@ def R2Q1(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.AddressOfEntryPoint?",
         "What is the RVA of the first code which executes in this binary?",
-        "What is the AVA of the first code which executes in this binary?"]
+        "What is the VA of the first code which executes in this binary?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
@@ -120,7 +120,7 @@ def R2Q1(questionCounter):
 def R2Q2(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.ImageBase?",
-        "What is the preferred AVA this binary would like to be loaded into memory at?"]
+        "What is the preferred VA this binary would like to be loaded into memory at?"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
@@ -209,9 +209,9 @@ def R2Q3(questionCounter):
 def R2Q4(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
   Qs = ["What is the value of IMAGE_OPTIONAL_HEADER.FileAlignment?",
-  "What are the alignment sizes needed to align section data in the file?",
+  "What is the alignment needed to align section data *in the file*?",
   "What is the value of IMAGE_OPTIONAL_HEADER.SectionAlignment?",
-  "What are the alignment sizes needed to align section information in memory?",]
+  "What is the alignment needed to align section information *in memory*?",]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR2
 
   x = random.randint(0,3)
@@ -356,7 +356,7 @@ def StartR2(seed, suppressRoundBanner, escapeScore):
     print "This round is about IMAGE_NT_HEADER.IMAGE_OPTIONAL_HEADER (\"Optional Header\")"
     print "\nRound terminology note:"
     print "RVA = Relative Virtual Address (relative to image base)."
-    print "AVA = Absolute Virtual Address (base + RVA)"
+    print "VA = Absolute Virtual Address (base + RVA)"
     print "================================================================================\n"
   #making a directory that the files go into, just to keep things tidier
   try:

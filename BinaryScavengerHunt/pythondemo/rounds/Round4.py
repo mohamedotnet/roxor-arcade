@@ -187,9 +187,9 @@ def R4Q3(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
   Qs = ["How many functions does this import from %s?",
         "At what RVA do the IAT entries from %s start?",
-        "At what AVA do the IAT entries from %s start?",
+        "At what VA do the IAT entries from %s start?",
         "At what RVA do the INT entries from %s start?",
-        "At what AVA do the INT entries from %s start?",
+        "At what VA do the INT entries from %s start?",
         "Does this import function %s!%s? (Y or N)"]
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR4
 
@@ -282,7 +282,7 @@ def StartR4(seed, suppressRoundBanner, escapeScore):
     print "This round is all about \"normal\" imports and the Import Address Table (IAT)"
     print "\nRound terminology note:"
     print "RVA = Relative Virtual Address (relative to image base)."
-    print "AVA = Absolute Virtual Address (base + RVA)"
+    print "VA = Absolute Virtual Address (base + RVA)"
     print "================================================================================\n"
   #making a directory that the files go into, just to keep things tidier
   try:

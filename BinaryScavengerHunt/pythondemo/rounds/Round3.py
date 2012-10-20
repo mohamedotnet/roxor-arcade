@@ -28,11 +28,11 @@ def R3Q0(questionCounter):
   #NOTE: if you update the number of questions in this function, you need to update the boundaries in StartR3
   Qs = ["What is the value of IMAGE_SECTION_HEADER.VirtualAddress?",
         "What is the RVA this section will be loaded at?",
-        "What is the AVA this section will be loaded at?",
+        "What is the VA this section will be loaded at?",
         "What is the value of IMAGE_SECTION_HEADER.Misc.VirtualSize?",
         "How much virtual memory will this section occupy?",
         "What is the RVA of the first byte of memory after this section?",
-        "What is the AVA of the first byte of memory after this section?",
+        "What is the VA of the first byte of memory after this section?",
         "What is the value of IMAGE_SECTION_HEADER.PointerToRawData?",
         "How far into the file on disk is the data for this section?",
         "What is the file offset for this section's data?",
@@ -152,6 +152,15 @@ def R3Q1(questionCounter):
   else:
     pe.sections[randSectIndex].Characteristics &= ~0x00000080
     IMAGE_SCN_CNT_UNINITIALIZED_DATA = "N"
+    
+  if random.randint(0,1) == 1:
+    pe.sections[randSectIndex].Characteristics |= 0x02000000
+    IMAGE_SCN_MEM_DISCARDABLE = "Y"
+    numFlagsSet += 1
+  else:
+    pe.sections[randSectIndex].Characteristics &= ~0x02000000
+    IMAGE_SCN_MEM_DISCARDABLE = "N"
+    
   if random.randint(0,1) == 1:
     pe.sections[randSectIndex].Characteristics |= 0x04000000
     IMAGE_SCN_MEM_NOT_CACHED = "Y"
@@ -159,6 +168,7 @@ def R3Q1(questionCounter):
   else:
     pe.sections[randSectIndex].Characteristics &= ~0x04000000
     IMAGE_SCN_MEM_NOT_CACHED = "N"
+
   if random.randint(0,1) == 1:
     pe.sections[randSectIndex].Characteristics |= 0x08000000
     IMAGE_SCN_MEM_NOT_PAGED = "Y"
@@ -166,6 +176,7 @@ def R3Q1(questionCounter):
   else:
     pe.sections[randSectIndex].Characteristics &= ~0x08000000
     IMAGE_SCN_MEM_NOT_PAGED = "N"
+
   if random.randint(0,1) == 1:
     pe.sections[randSectIndex].Characteristics |= 0x10000000
     IMAGE_SCN_MEM_SHARED = "Y"
@@ -173,6 +184,7 @@ def R3Q1(questionCounter):
   else:
     pe.sections[randSectIndex].Characteristics &= ~0x10000000
     IMAGE_SCN_MEM_SHARED = "N"
+
   if random.randint(0,1) == 1:
     pe.sections[randSectIndex].Characteristics |= 0x20000000
     IMAGE_SCN_MEM_EXECUTE = "Y"
@@ -180,6 +192,7 @@ def R3Q1(questionCounter):
   else:
     pe.sections[randSectIndex].Characteristics &= ~0x20000000
     IMAGE_SCN_MEM_EXECUTE = "N"
+
   if random.randint(0,1) == 1:
     pe.sections[randSectIndex].Characteristics |= 0x80000000
     IMAGE_SCN_MEM_WRITE = "Y"
@@ -339,7 +352,7 @@ def StartR3(seed, suppressRoundBanner, escapeScore):
     print "This round is all about IMAGE_SECTION_HEADERs (\"Section Headers\")"
     print "\nRound terminology note:"
     print "RVA = Relative Virtual Address (relative to image base)."
-    print "AVA = Absolute Virtual Address (base + RVA)"
+    print "VA = Absolute Virtual Address (base + RVA)"
     print "================================================================================\n"
   #making a directory that the files go into, just to keep things tidier
   try:
