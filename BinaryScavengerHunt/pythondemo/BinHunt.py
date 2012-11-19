@@ -17,6 +17,7 @@ import random
 import pefile
 from time import time
 from rounds import *
+#import rounds.helpers
 
 #This will select one question at a time randomly from rounds 1 to previousRoundCap, inclusive
 def RandomQuestionsFromPreviousRounds(seed, roundEscapeScore, previousRoundCap):
@@ -73,6 +74,8 @@ else:
   print "Time-based seed = %u" % (seed)
 
 helpers.gStartingSeed = seed
+#need to set this here, so it doesn't get reset when we jump backwards to round 1 questions after round 2
+helpers.gAbsoluteStartTime = int(time())
 
 if skipToRound <= 1:
   Round1.StartR1(seed, 0, 1000)

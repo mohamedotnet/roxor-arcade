@@ -55,8 +55,17 @@ def R7Q0(questionCounter):
     if random.randint(0,1):
       pe.FILE_HEADER.TimeDateStamp = pe.DIRECTORY_ENTRY_DEBUG[0].struct.TimeDateStamp
   
-  #TODO: randomize some more of these elements
-  pe.write(outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      outFileName = "Round7Q" + str(questionCounter) + suffix
+      #TODO: randomize some more of these elements
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+
   
   q = random.randint(0,len(Qs)-1)
   print "For binary R7Bins/%s..." % outFileName
@@ -113,12 +122,18 @@ def R7Q1(questionCounter):
   else:
     pe = pefile.PE('../template64-bound.dll')
     suffix = ".dll"
-
-  outFileName = "Round7Q" + str(questionCounter) + suffix
    
-  #TODO: randomize some more of these elements
-  pe.write(outFileName)
-  
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      outFileName = "Round7Q" + str(questionCounter) + suffix
+      #TODO: randomize some more of these elements
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+        
   q = random.randint(0,len(Qs)-1)
   print "For binary R7Bins/%s..." % outFileName
   relocEntry = pe.DIRECTORY_ENTRY_BASERELOC[random.randint(0,len(pe.DIRECTORY_ENTRY_BASERELOC)-1)]
@@ -175,7 +190,10 @@ def StartR7(seed, suppressRoundBanner, escapeScore):
   os.chdir("R7Bins")
   filelist = [ f for f in os.listdir(".")]
   for f in filelist:
-    os.remove(f)
+    try:
+      os.remove(f)
+    except OSError:
+      pass
   roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)

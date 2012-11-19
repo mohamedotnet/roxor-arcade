@@ -55,9 +55,16 @@ def R4Q0(questionCounter):
 
   #TODO: eventually I want to be able to move around the IAT
 
-  #write out the (actually un)modified file
-  outFileName = "Round4Q" + str(questionCounter) + suffix
-  pe.write(outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round4Q" + str(questionCounter) + suffix
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
   
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -102,9 +109,16 @@ def R4Q1(questionCounter):
 
   #TODO: eventually I want to be able to add new IAT information
 
-  #write out the (actually un)modified file
-  outFileName = "Round4Q" + str(questionCounter) + suffix
-  pe.write(filename=outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round4Q" + str(questionCounter) + suffix
+      pe.write(filename=outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -152,11 +166,19 @@ def R4Q2(questionCounter):
   #TODO: eventually I want to be able to move around the IAT
   #For now it will always be in the same section, but with a randomized name
   RandomizeSectionNames(pe)
-  #write out the modified file
-  outFileName = "Round4Q" + str(questionCounter) + suffix
-  pe.write(filename=outFileName)
-  pe = pefile.PE(outFileName)
 
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the modified file
+      outFileName = "Round4Q" + str(questionCounter) + suffix
+      pe.write(filename=outFileName)
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+  
   #Print the question
   q = random.randint(0,len(Qs)-1)
   print "For binary R4Bins/%s..." % outFileName
@@ -213,10 +235,17 @@ def R4Q3(questionCounter):
   #TODO: eventually I want to be able to move around the IAT
   #For now it will always be in the same section, but with a randomized name
   RandomizeSectionNames(pe)
-  #write out the modified file
-  outFileName = "Round4Q" + str(questionCounter) + suffix
-  pe.write(filename=outFileName)
-  pe = pefile.PE(outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the modified file
+      outFileName = "Round4Q" + str(questionCounter) + suffix
+      pe.write(filename=outFileName)
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
   #pick the question
   q = random.randint(0,len(Qs)-1)
@@ -283,6 +312,7 @@ def StartR4(seed, suppressRoundBanner, escapeScore):
     print "\nRound terminology note:"
     print "RVA = Relative Virtual Address (relative to image base)."
     print "VA = Absolute Virtual Address (base + RVA)"
+    print "foo!bar = program foo, function bar (windbg notation)"
     print "================================================================================\n"
   #making a directory that the files go into, just to keep things tidier
   try:
@@ -292,7 +322,10 @@ def StartR4(seed, suppressRoundBanner, escapeScore):
   os.chdir("R4Bins")
   filelist = [ f for f in os.listdir(".")]
   for f in filelist:
-    os.remove(f)
+    try:
+      os.remove(f)
+    except OSError:
+      pass
   roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)

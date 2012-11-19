@@ -11,8 +11,7 @@
 # Special thanks to Ero Carrera for creating the pefile python library,
 # without which, making this game would have taken much longer
 
-#This is Round 3 and will cover questions on the IMAGE_SECTION_HEADER
-#and about the sections in the binary
+#This is Round 9 and will cover questions on resources
 
 import os
 import random

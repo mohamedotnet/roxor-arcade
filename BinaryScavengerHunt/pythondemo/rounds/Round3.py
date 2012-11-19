@@ -57,10 +57,17 @@ def R3Q0(questionCounter):
 
   RandomizeSectionNames(pe)
   
-  #write out the modified file
-  outFileName = "Round3Q" + str(questionCounter) + suffix
-  pe.write(filename=outFileName)
-
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the modified file
+      outFileName = "Round3Q" + str(questionCounter) + suffix
+      pe.write(filename=outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+  
   #pick a random section
   randSectIndex = random.randint(0,len(pe.sections)-1)
   #Print the question
@@ -201,10 +208,18 @@ def R3Q1(questionCounter):
     pe.sections[randSectIndex].Characteristics &= ~0x80000000
     IMAGE_SCN_MEM_WRITE = "N"
 
-  #write out the modified file
-  outFileName = "Round3Q" + str(questionCounter) + suffix
-  pe.write(filename=outFileName)
-
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the modified file
+      outFileName = "Round3Q" + str(questionCounter) + suffix
+      pe.write(filename=outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+  
+ 
   #Print the question
   q = random.randint(0,len(Qs)-1)
   print "For binary R3Bins/%s..." % outFileName
@@ -312,7 +327,6 @@ def R3Q3(questionCounter):
     pe = pefile.PE('../template64.dll')
     suffix = ".dll"
 
-  outFileName = "Round3Q" + str(questionCounter) + suffix
   #Created new function to insert random sections and write the file out
   numExtraSections = random.randint(1,5)
   totalNumSections = pe.FILE_HEADER.NumberOfSections + numExtraSections 
@@ -320,9 +334,20 @@ def R3Q3(questionCounter):
   #this function will know whether to add new sections based on whether the first param
   #is greater than the existing header or not
   updateSizeOfImage = random.randint(0,1)
-  pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, updateSizeOfImage, outFileName)
-  #Reopen the file otherwise the pe.sections[] calculations below won't be accurate
-  pe = pefile.PE(outFileName)
+
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the modified file
+      outFileName = "Round3Q" + str(questionCounter) + suffix
+      pe.x_modifySectionsAndWrite(totalNumSections, randomSectionNames, updateSizeOfImage, outFileName)
+      #Reopen the file otherwise the pe.sections[] calculations below won't be accurate
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -362,7 +387,10 @@ def StartR3(seed, suppressRoundBanner, escapeScore):
   os.chdir("R3Bins")
   filelist = [ f for f in os.listdir(".")]
   for f in filelist:
-    os.remove(f)
+    try:
+      os.remove(f)
+    except OSError:
+      pass
   roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)

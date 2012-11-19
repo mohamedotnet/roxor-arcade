@@ -2098,7 +2098,7 @@ class PE:
 ###################################
 
     #This should be used to make a generic insert_bytes later
-    def randomize_NT_HEADER_location(self, bytelist, insert_offset, filename=None):
+    def x_randomize_NT_HEADER_location(self, bytelist, insert_offset, filename=None):
         """Insert arbitrary file data and update structure offsets.
 
         This function will process all headers and components
@@ -2110,17 +2110,17 @@ class PE:
         multiples of 4 bytes long.
         """
 
-      	maxSize = self.OPTIONAL_HEADER.FileAlignment
-      	if len(bytelist) > maxSize:
-      	  print "input bytelist too long"
-      	  return "input bytelist too long"
+        maxSize = self.OPTIONAL_HEADER.FileAlignment
+        if len(bytelist) > maxSize:
+          print "input bytelist too long"
+          return "input bytelist too long"
       
         if (len(bytelist) % 4) != 0:
-      	  print "bytelist not 4 byte aligned"
-      	  return "bytelist not 4 byte aligned"
+          print "bytelist not 4 byte aligned"
+          return "bytelist not 4 byte aligned"
       
-      	nopStr = ['\x90'] * (maxSize - len(bytelist))
-      #	nopStr.extend(bytelist)
+        nopStr = ['\x90'] * (maxSize - len(bytelist))
+      #  nopStr.extend(bytelist)
 
         file_data = list(self.__data__)
  
@@ -2152,7 +2152,7 @@ class PE:
 #        print file_data[insert_offset:insert_offset+len(bytelist)+10]
 
         #For now, since we know that we're inserting the change before the IMAGE_NT_HEADER
-	#just go ahead and manipulate e_lfanew. Later, make this more generic
+  #just go ahead and manipulate e_lfanew. Later, make this more generic
         self.DOS_HEADER.e_lfanew += len(bytelist)
 
         #Update all the PointerToRawData entries to account for the insert
@@ -2192,7 +2192,7 @@ class PE:
     #This should be used to make a generic insert_bytes later
     #The reason we have the updateSizeOfImage as a conditional option, is so that we can reuse
     #this function for questions in round 2 and 3
-    def modifySectionsAndWrite(self, totalNumSections, randomSectionNames, updateSizeOfImage, filename=None):
+    def x_modifySectionsAndWrite(self, totalNumSections, randomSectionNames, updateSizeOfImage, filename=None):
         """Insert arbitrary file data and update structure offsets.
 
         This function will add random section headers after the 
@@ -2309,7 +2309,7 @@ class PE:
 ############################################################ (it's so I can see where my functions break better :P)
 
     #Doing a whole lot of work to create faux-delay-load IAT entries
-    def CreateDelayLoadEntries(self, randomDllList, randomFunctionsList, filename=None):
+    def x_CreateDelayLoadEntries(self, randomDllList, randomFunctionsList, filename=None):
         """Create a new section after all the existing sections
 
         Inside the last section, place a delayed import descriptor table
@@ -2527,7 +2527,7 @@ class PE:
     #While it would be possible to add exports to an exe, I want to be able to assume there
     #is already an export directory and some real functions which should still be callable
     #after the new fake imports have been added.
-    def CreateExports(self, numRandomFuncs, randomFunctionsList, filename=None):
+    def x_CreateExports(self, numRandomFuncs, randomFunctionsList, filename=None):
         """Create a new section after all the existing sections
 
         Inside the last section, place new EAT, ENT, and NameOrdinals tables
@@ -2542,7 +2542,6 @@ class PE:
         fileDataLenBeforeInserts = len(file_data) #use this for our pointerToRawData
 
         self.FILE_HEADER.NumberOfSections += 1
-
         exportedFuncNames = []
         i = 0
         while i< numRandomFuncs:
@@ -2688,6 +2687,129 @@ class PE:
         else:
             return new_file_data
 
+############################################################ (it's so I can see where my functions break better :P)
+
+    #Doing a moderate amount of work to add TLS entries to the end
+    #This function should only be called on template32-tls.exe, because we make
+    #assumptions about it already having particular exports that the callbacks
+    #can be pointed at
+    def x_CreateTLS(self, randomCallbackAddressesList, filename=None):
+        """Create a new section after all the existing sections
+
+        Inside the last section, place new TLS Directory followed by callback table
+        """
+        
+        file_data = list(self.__data__)
+        fileDataLenBeforeInserts = len(file_data) #use this for our pointerToRawData
+
+        self.FILE_HEADER.NumberOfSections += 1
+        
+        tlsDir = Structure(self.__IMAGE_TLS_DIRECTORY_format__)
+        tlsDir.__unpack__("\0"*tlsDir.sizeof())
+        #Now create a holder section
+        tmpSection = SectionStructure( self.__IMAGE_SECTION_HEADER_format__, pe=self )
+        if not tmpSection:
+          return
+        sectHdrSize = self.sections[0].sizeof()
+        tmpSection.__unpack__("\0"*sectHdrSize) #fill in with all zeros to start
+
+        #Get the ending virtual address of the last section
+        existingLastSectionEndVA = self.sections[-1].VirtualAddress + self.sections[-1].Misc_VirtualSize
+        #round up to the nearest 0x1000
+        if existingLastSectionEndVA % 1000:
+          existingLastSectionEndVA += (0x1000 - existingLastSectionEndVA % 0x1000)
+        
+        
+        ######## Now get into the nitty gritty of setting up all the tables for TLS ########
+        masterByteArray = []
+
+        #The callback table will be right after the TLS directory
+        tlsDir.AddressOfCallBacks = self.OPTIONAL_HEADER.ImageBase + existingLastSectionEndVA + tlsDir.sizeof()
+        #print list(tlsDir.__pack__())
+        #FIXME: AddressofIndex needs to be set to something for it to work, but I don't know what :-/
+
+        #Write the raw values into the list        
+        i = 0
+        while i < len(randomCallbackAddressesList):
+          masterByteArray += struct.pack("@I",randomCallbackAddressesList[i]) #FIXME: this could be the source for some 64 bit incompat. try condition @Q later
+          i+=1
+        
+        #print masterByteArray
+        
+        ###write all the rest of the data which we've accumulated
+        file_data += list(tlsDir.__pack__())
+        file_data += masterByteArray
+        totalSectionSize = tlsDir.sizeof() + len(masterByteArray)
+
+        #Create the padding string which will be written after the inserted section headers
+        nopStr = ['\x90'] * (self.OPTIONAL_HEADER.FileAlignment - (totalSectionSize % self.OPTIONAL_HEADER.FileAlignment))
+        ###Now insert the nops after the section headers to pad out 
+        #the write to a total displacement size of FileAlignment
+        file_data += nopStr
+        
+        ####### DONE with most of the export stuff. Now add the section header, now that we know the total size the section ####### 
+        
+        #We're still going to insert the new sect hdr after the existing sect hdrs
+        offsetAfterSectHdr = self.sections[-1].get_file_offset() + sectHdrSize
+
+        #Set all the section information
+        tmpSection.set_file_offset(offsetAfterSectHdr)
+        tmpSection.Name = ".tls"
+        tmpSection.Misc_VirtualSize = totalSectionSize + 0x200
+        #Once we've got the size of all our data, pad it out to 
+        #the self.OPTIONAL_HEADER.FileAlignment size
+        tmpSection.SizeOfRawData = totalSectionSize + (self.OPTIONAL_HEADER.FileAlignment - (totalSectionSize % self.OPTIONAL_HEADER.FileAlignment))
+        tmpSection.VirtualAddress = existingLastSectionEndVA
+        #Need to account for the fact that the end of the file location will
+        #change right after we insert our own section header + padding
+        tmpSection.PointerToRawData = fileDataLenBeforeInserts + self.OPTIONAL_HEADER.FileAlignment
+        tmpSection.Characteristics = 0x40000040
+
+        #Insert the section into the file
+        file_data[offsetAfterSectHdr:offsetAfterSectHdr] = list(tmpSection.__pack__())
+        offsetAfterSectHdr += sectHdrSize
+
+        #Create the padding string which will be written after the inserted section headers
+        nopStr = ['\x90'] * (self.OPTIONAL_HEADER.FileAlignment - sectHdrSize)
+        #Now insert the nops after the section headers to pad out 
+        #the write to a total displacement size of FileAlignment
+        file_data[offsetAfterSectHdr:offsetAfterSectHdr] = nopStr
+
+        #As I found out the hard way, it really doesn't like it if you don't update
+        #the OPTIONAL_HEADER.SizeOfImage (Windows doesn't seem to care about the SizeOfHeaders
+        #but I will update that anyway)
+        self.OPTIONAL_HEADER.SizeOfImage = (tmpSection.VirtualAddress + tmpSection.Misc_VirtualSize)
+        self.OPTIONAL_HEADER.SizeOfHeaders += sectHdrSize
+
+        self.OPTIONAL_HEADER.DATA_DIRECTORY[9].VirtualAddress = tmpSection.VirtualAddress
+        self.OPTIONAL_HEADER.DATA_DIRECTORY[9].Size = tmpSection.Misc_VirtualSize
+        
+        #Update all the PointerToRawData entries to account for the insert of the sectHdrSize + padding worth of data
+        for section in self.sections:
+            section.PointerToRawData += self.OPTIONAL_HEADER.FileAlignment
+        
+        self.OPTIONAL_HEADER.CheckSum = self.generate_checksum()
+
+        #Update every struct's ostensible location in the file to account for the insert
+        #So that when it gets written back, it will be in the right place
+        for structure in self.__structures__:
+
+            offset = structure.get_file_offset()
+            if offset >= tmpSection.get_file_offset():
+              structure.set_file_offset(offset + self.OPTIONAL_HEADER.FileAlignment)
+            
+            offset = structure.get_file_offset()
+            struct_data = list(structure.__pack__())
+            file_data[offset:offset+len(struct_data)] = struct_data
+
+        new_file_data = ''.join( [ chr(ord(c)) for c in file_data] )
+
+        if filename:
+            f = file(filename, 'wb+')
+            f.write(new_file_data)
+            f.close()
+        else:
+            return new_file_data
 ###################################
 # END XENO'S CHANGES
 ###################################

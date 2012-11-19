@@ -65,9 +65,16 @@ def R6Q0(questionCounter):
 
   #TODO: want to be able to randomize entries/size of delay load IAT
 
-  #write out the (actually un)modified file
-  outFileName = "Round6Q" + str(questionCounter) + suffix
-  pe.write(outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round6Q" + str(questionCounter) + suffix
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
   
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -152,10 +159,17 @@ def R6Q1(questionCounter):
 #    pe = pefile.PE('../template64-bound.dll')
 #    suffix = ".dll"
 
-  outFileName = "Round6Q" + str(questionCounter) + suffix
-  pe.CreateExports(5, funcs, outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      outFileName = "Round6Q" + str(questionCounter) + suffix
+      pe.x_CreateExports(5, funcs, outFileName)
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
-  pe = pefile.PE(outFileName)
 
   #pick a random export to ask questions about
   randomOrdinal = random.randint(0,len(pe.DIRECTORY_ENTRY_EXPORT.symbols)-1)
@@ -201,7 +215,10 @@ def StartR6(seed, suppressRoundBanner, escapeScore):
   os.chdir("R6Bins")
   filelist = [ f for f in os.listdir(".")]
   for f in filelist:
-    os.remove(f)
+    try:
+      os.remove(f)
+    except OSError:
+      pass
   roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)

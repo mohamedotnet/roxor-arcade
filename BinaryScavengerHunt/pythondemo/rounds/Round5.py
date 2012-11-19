@@ -49,10 +49,17 @@ def R5Q0(questionCounter):
     suffix = ".dll"
 
   #TODO: want to be able to randomize entries/size of delay load IAT
-
-  #write out the (actually un)modified file
-  outFileName = "Round5Q" + str(questionCounter) + suffix
-  pe.write(outFileName)
+  
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round5Q" + str(questionCounter) + suffix
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
   
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -102,9 +109,16 @@ def R5Q1(questionCounter):
 
   #TODO: want to be able to randomize entries/size of delay load IAT
 
-  #write out the (actually un)modified file
-  outFileName = "Round5Q" + str(questionCounter) + suffix
-  pe.write(outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round5Q" + str(questionCounter) + suffix
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
   
   #pick a random bound import entry
   entry = pe.DIRECTORY_ENTRY_BOUND_IMPORT[random.randint(0, len(pe.DIRECTORY_ENTRY_BOUND_IMPORT)-1)]
@@ -175,11 +189,18 @@ def R5Q2(questionCounter):
     randomFunctionsList[i] += GetExportsByName(randomDllList[i]);
     i+=1
   
-  #This will create a new section, ".dload", with a bunch of fake entries for delay load imports
-  pe.CreateDelayLoadEntries(randomDllList, randomFunctionsList, outFileName)
-  #reopen so we can pick a random delay load entry
-  pe = pefile.PE(outFileName)
-
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #This will create a new section, ".dload", with a bunch of fake entries for delay load imports
+      pe.x_CreateDelayLoadEntries(randomDllList, randomFunctionsList, outFileName)
+      #reopen so we can pick a random delay load entry
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+  
   #select random existing DLL being imported from
   entry = pe.DIRECTORY_ENTRY_DELAY_IMPORT[random.randint(0, len(pe.DIRECTORY_ENTRY_DELAY_IMPORT)-1)]
 
@@ -253,9 +274,16 @@ def R5Q3(questionCounter):
 
   #TODO: want to be able to randomize entries/size of delay load IAT
 
-  #write out the (actually un)modified file
-  outFileName = "Round5Q" + str(questionCounter) + suffix
-  pe.write(outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round5Q" + str(questionCounter) + suffix
+      pe.write(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
   
   #Print the question
   print "For binary R5Bins/%s..." % outFileName
@@ -287,7 +315,10 @@ def StartR5(seed, suppressRoundBanner, escapeScore):
   os.chdir("R5Bins")
   filelist = [ f for f in os.listdir(".")]
   for f in filelist:
-    os.remove(f)
+    try:
+      os.remove(f)
+    except OSError:
+      pass
   roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)

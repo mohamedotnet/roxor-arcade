@@ -62,14 +62,21 @@ def R1Q1(questionCounter):
     pe = pefile.PE('../template64.dll')
     suffix = ".dll"
 
-  outFileName = "Round1Q" + str(questionCounter) + suffix
-
   #pe.write(filename=outFileName)
   #Made a new function in pefile which also writes the file
   #Create a random sized (but less than 0x200) byte list
   bytelist = ['\x41']*4*random.randint(0,128)
   #Insert the byte string wherever the DOS_HEADER.e_lfanew currently says it is
-  pe.randomize_NT_HEADER_location(bytelist, pe.DOS_HEADER.e_lfanew, outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      outFileName = "Round1Q" + str(questionCounter) + suffix
+      pe.x_randomize_NT_HEADER_location(bytelist, pe.DOS_HEADER.e_lfanew, outFileName)
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
   #Print the question
   q = random.randint(0,len(Qs)-1)
@@ -129,8 +136,15 @@ def R1Q2(questionCounter):
   currentYear = 1970 + int(currentTime / 31556926)    
  
   #write out the modified file
-  outFileName = "Round1Q" + str(questionCounter) + suffix
-  pe.write(filename=outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      outFileName = "Round1Q" + str(questionCounter) + suffix
+      pe.write(filename=outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
   #Print the question
   print "For binary R1Bins/%s..." % outFileName
@@ -182,9 +196,16 @@ def R1Q3(questionCounter):
   #In the future we might want to make modifications to the template binary in every case
   #but for now I don't think it significantly improves the learning, and it's just extra work ;)
  
-  #write out the (actually un)modified file
-  outFileName = "Round1Q" + str(questionCounter) + ".exe"
-  pe.write(filename=outFileName)
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the (actually un)modified file
+      outFileName = "Round1Q" + str(questionCounter) + ".exe"
+      pe.write(filename=outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
   #Print the question
   print "For binary R1Bins/%s..." % outFileName
@@ -241,10 +262,6 @@ def R1Q4(questionCounter):
     pe = pefile.PE('../template64.dll')
     suffix = ".dll"
     
-  #write out the modified file
-  outFileName = "Round1Q" + str(questionCounter) + suffix
-  #pe.write(filename=outFileName)
-
   #Created new function to insert random sections and write the file out
   numExtraSections = random.randint(1,5)
   #print "numExtraSections = %u" % numExtraSections
@@ -252,6 +269,20 @@ def R1Q4(questionCounter):
   totalNumSections = existingNumSections + numExtraSections 
   #If it picks 5 there is then a 25% chance you will get rickrolled by the 
   #section names! (5% chance overall) Easter Egg! :D
+
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      outFileName = "Round1Q" + str(questionCounter) + ".exe"
+      #Since we haven't actually modified pe.FILE_HEADER.NumberOfSections in the binary yet
+      #this function will know whether to add new sections based on whether the first param
+      #is greater than the existing header or not
+      pe.x_modifySectionsAndWrite(totalNumSections, randomSectionNames, 1, outFileName)
+      pe = pefile.PE(outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
 
   #Print the question
   print "For binary R1Bins/%s..." % outFileName
@@ -264,11 +295,6 @@ def R1Q4(questionCounter):
       correctStr = "N"
   else:
     interpolatedQuestion = Qs[q]
-
-  #Since we haven't actually modified pe.FILE_HEADER.NumberOfSections in the binary yet
-  #this function will know whether to add new sections based on whether the first param
-  #is greater than the existing header or not
-  pe.modifySectionsAndWrite(totalNumSections, randomSectionNames, 1, outFileName)
 
   #ask question
   print interpolatedQuestion
@@ -350,10 +376,17 @@ def R1Q5(questionCounter):
     pe.FILE_HEADER.Characteristics &= ~0x100
     is32Characteristics = "N"
      
-  #write out the modified file
-  outFileName = "Round1Q" + str(questionCounter) + ".txt"
-  pe.write(filename=outFileName)
-
+  #FIXME: what's the more graceful way of doing this?
+  error = 1
+  while error:
+    try:
+      #write out the modified file
+      outFileName = "Round1Q" + str(questionCounter) + ".txt"
+      pe.write(filename=outFileName)
+      error = 0
+    except IOError:
+      questionCounter+=1
+  
   #Print the question
   print "For binary R1Bins/%s..." % outFileName
   print Qs[q]
@@ -389,8 +422,11 @@ def StartR1(seed, suppressRoundBanner, escapeScore):
   os.chdir("R1Bins")
   filelist = [ f for f in os.listdir(".")]
   for f in filelist:
-    os.remove(f)
-  rounds.helpers.gAbsoluteStartTime = roundStartTime = int(time())
+    try:
+      os.remove(f)
+    except OSError:
+      pass
+  roundStartTime = int(time())
   rounds.helpers.gNextLevelRequiredScore = escapeScore
   random.seed(seed)
   questionCounter = 0;
